@@ -3,16 +3,18 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Data Satuan</h3>
+          <h3 class="card-title">Data Jenis Barang</h3>
           <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
         </div>
         <div class="card-body border-bottom py-3">
           <?= $this->session->flashdata('psn'); ?>
-          <table id="myTable" class="table table-bordered">
+          <table id="tabelKategori" class="table table-bordered">
             <thead>
               <tr>
                 <th>No</th>
-                <th>Nama Satuan</th>
+                <th>Nama Kategori</th>
+                <th>Satuan Barang</th>
+                <th>Jumlah Stok Barang</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -32,14 +34,23 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Satuan</h5>
+        <h5 class="modal-title">Tambah Data Jenis barang</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="<?= base_url(); ?>Satuan/simpanSatuan" method="POST">
+        <form action="<?= base_url(); ?>KategoriBarang/simpanBarang" method="POST">
           <div class="mb-3">
-            <label class="form-label">Nama Satuan Barang</label>
-            <input type="text" class="form-control" name="satuan" placeholder="Input Nama Satuan arang" required>
+            <label class="form-label">Nama Kategori Barang</label>
+            <input type="text" class="form-control" name="namaKategoriBarang" placeholder="Input Nama Kategori Batrang" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Satuan Barang</label>
+            <select class="form-select" name="satuan" id="satuan" required>
+              <option value="" selected disabled>--- Pilih Satuan ---</option>
+              <?php foreach ($dataSatuan as $key => $value) { ?>
+                <option value="<?= $value->id; ?>"><?= $value->nama_satuan; ?></option>
+              <?php } ?>
+            </select>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
@@ -59,15 +70,24 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Data Satuan</h5>
+        <h5 class="modal-title">Edit Data Jenis Barang</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="<?= base_url(); ?>Satuan/simpanEditSatuan" method="POST">
+        <form action="<?= base_url(); ?>KategoriBarang/simpanEditSatuan" method="POST">
           <div class="mb-3">
-            <label class="form-label">Nama Satuan Barang</label>
-            <input type="text" class="form-control" name="editSatuan" id="editSatuan" placeholder="Input Nama Satuan arang" required>
+            <label class="form-label">Nama Jenis Barang</label>
+            <input type="text" class="form-control" name="namaKategoriBarangEdit" id="namaKategoriBarangEdit" placeholder="Input Nama Kategori Batrang" required>
             <input type="hidden" name="idEdit" id="idEdit">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Satuan Barang</label>
+            <select class="form-select" name="satuanEdit" id="satuanEdit" required>
+              <option value="" selected disabled>--- Pilih Satuan ---</option>
+              <?php foreach ($dataSatuan as $key => $value) { ?>
+                <option value="<?= $value->id; ?>"><?= $value->nama_satuan; ?></option>
+              <?php } ?>
+            </select>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
@@ -89,13 +109,13 @@
       $('#modalTambah').modal('show');
     }
 
-
     editFunction = function (id) {
 
-      ajaxUntukSemua(base_url()+'Satuan/getById', {id}, function(data) {
+      ajaxUntukSemua(base_url()+'KategoriBarang/getById', {id}, function(data) {
 
-        $('#editSatuan').val(data.data.nama_satuan);
+        $('#namaKategoriBarangEdit').val(data.data.nama_barang);
         $('#idEdit').val(data.data.id);
+        $("#satuanEdit").val(data.data.id_satuan);
         $('#modalEdit').modal('show');
 
       }, 
@@ -103,7 +123,6 @@
         console.log('Kesalahan:', error);
         t_error('Sistem Error, Pesan : '+error)
       });
-
 
     }
 
@@ -117,7 +136,7 @@
         cancelButtonText: 'Batal'
       }).then((result) => {
         if (result.isConfirmed) {
-          ajaxUntukSemua(base_url()+'Satuan/deleteData', {id}, function(data) {
+          ajaxUntukSemua(base_url()+'KategoriBarang/deleteData', {id}, function(data) {
             location.reload();
           }, 
           function(error) {
@@ -129,11 +148,11 @@
     }
 
 
-    var dataTable = $('#myTable').DataTable({
+    var dataTable = $('#tabelKategori').DataTable({
       "processing": true,
       "serverSide": true,
       "ajax": {
-        "url": "<?php echo base_url('Satuan/get_data'); ?>",
+        "url": "<?php echo base_url('KategoriBarang/get_data'); ?>",
         "type": "POST"
       },
       "columns": [
@@ -148,9 +167,21 @@
         "orderable": false,
       },
       {
+        "data": "nama_barang", 
+        "name": "nama barang",
+        "width" : "30%",
+        "class" : "text-center"
+      },
+      {
         "data": "nama_satuan", 
-        "name": "Nama Satuan",
-        "width" : "50%",
+        "name": "satuan barang",
+        "width" : "30%",
+        "class" : "text-center"
+      },
+      {
+        "data": "stok_barang", 
+        "name": "Jumlah Stok Barang",
+        "width" : "30%",
         "class" : "text-center"
       },
       {

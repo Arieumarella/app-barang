@@ -58,6 +58,7 @@
 </style>
 </head>
 <body  class=" layout-fluid">
+
  <!-- Sidebar -->
  <?php $this->load->view('tamplate/'.$sidebar); ?>
  <!-- End Sidebar -->
@@ -86,6 +87,9 @@
 <script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toastr.min.js"></script>
 <!-- Custom Toast -->
 <script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toast_custom.js"></script>
+
+<!-- Lite Picker -->
+<script src="<?= base_url(); ?>assets/dist/libs/litepicker/dist/litepicker.js" defer></script>
 
 <script>
   <?php if ($tittle == 'Home') { ?>

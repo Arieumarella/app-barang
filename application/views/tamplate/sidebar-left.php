@@ -163,7 +163,7 @@
           </span>
         </a>
       </li>
-      <?php $menuBarang = ['Satuan']; ?>
+      <?php $menuBarang = ['Satuan', 'Kategori Barang', 'Input Stock Barang', 'Permohonan Barang']; ?>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle <?= (in_array($tittle, $menuBarang)) ? 'show' : ''; ?>" href="#navbar-base" data-bs-toggle="dropdown" data-bs-auto-close="true" role="button" aria-expanded="false" >
           <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/package -->
@@ -176,14 +176,17 @@
         <div class="dropdown-menu <?= (in_array($tittle, $menuBarang)) ? 'show' : ''; ?>">
           <div class="dropdown-menu-columns">
             <div class="dropdown-menu-column">
-              <a class="dropdown-item" href="<?= base_url(); ?>">
-                Kategori barang
+              <a class="dropdown-item" href="<?= base_url(); ?>KategoriBarang">
+                Janis Barang
               </a>
               <a class="dropdown-item" href="<?= base_url(); ?>Satuan">
                 Satuan Barang
               </a>
-              <a class="dropdown-item" href="<?= base_url(); ?>assets/blank.html">
-                Stok Barang
+              <a class="dropdown-item" href="<?= base_url(); ?>StockBarang">
+                Input Data Barang Masuk
+              </a>
+              <a class="dropdown-item" href="<?= base_url(); ?>PermohonanBarang">
+                Permohonan Barang
               </a>
             </div>
           </div>

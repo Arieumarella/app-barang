@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Satuan extends CI_Controller {
+class KategoriBarang extends CI_Controller {
 
 	public function __construct() {
 		parent:: __construct();
@@ -26,91 +26,37 @@ class Satuan extends CI_Controller {
 		}
 
 		$this->load->model('M_dinamis');
-		$this->load->model('M_satuan');
+		$this->load->model('M_kategoriBarang');
 	}
+
 
 	public function index()
 	{
-
 		$tmp = array(
-			'tittle' => 'Satuan',
+			'tittle' => 'Kategori Barang',
 			'header_content' => 'header2',
 			'footer_content' => 'footer',
 			'sidebar' => 'sidebar-left',
-			'content' => 'Satuan'
+			'content' => 'kategoriBarang',
+			'dataSatuan' => $this->M_dinamis->add_all('t_satuan', '*', 'id', 'asc')
 		);
 
 		$this->load->view('tamplate/baseTamplate', $tmp);
-
 	}
 
-
-	public function simpanSatuan()
+	public function simpanBarang()
 	{
-		$nmSatuan = $this->input->post('satuan');
+		$jnsBarang = $this->input->post('namaKategoriBarang');
+		$idSatuan = $this->input->post('satuan');
 
 		$dataInsert = array(
-			'nama_satuan' => $nmSatuan,
+			'nama_barang' => $jnsBarang,
+			'id_satuan' => $idSatuan,
+			'stok_barang' => 0,
 			'created_at' => date('Y-m-d H:i:s')
 		);
 
-		$pros = $this->M_dinamis->save('t_satuan', $dataInsert);
-
-
-		if ($pros) {
-			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data berhasil disimpan.!
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>');
-		}else{
-			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal disimpan.!
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>');
-		}
-
-		redirect('/Satuan', 'refresh');
-	}
-
-
-	public function getById()
-	{
-		$id = $this->input->post('id');
-
-		$data = $this->M_dinamis->getById('t_satuan', ['id' => $id]);
-
-		echo json_encode(['code' => 200, 'data' => $data]);
-	}
-
-
-	public function deleteData()
-	{
-		$id = $this->input->post('id');
-
-		$pros = $this->M_dinamis->delete('t_satuan', ['id' => $id]);
-
-		if ($pros) {
-			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data berhasil dihapus.!
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>');
-		}else{
-			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal dihapus.!
-				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>');
-		}
-
-		echo json_encode(['code' => 200]);
-	}
-
-
-	public function simpanEditSatuan()
-	{
-		$editSatuan = $this->input->post('editSatuan');
-		$idEdit = $this->input->post('idEdit');
-
-		$pros = $this->M_dinamis->update('t_satuan', ['nama_satuan' => $editSatuan], ['id' => $idEdit]);
+		$pros = $this->M_dinamis->save('t_barang', $dataInsert);
 
 		if ($pros) {
 			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -124,7 +70,64 @@ class Satuan extends CI_Controller {
 				</div>');
 		}
 
-		redirect('/Satuan', 'refresh');
+		redirect('/KategoriBarang', 'refresh');
+	}
+
+
+	public function getById()
+	{
+		$id = $this->input->post('id');
+
+		$data = $this->M_dinamis->getById('t_barang', ['id' => $id]);
+
+		echo json_encode(['data' => $data]);
+	}
+
+
+	public function deleteData()
+	{
+		$id = $this->input->post('id');
+
+		$pros = $this->M_dinamis->delete('t_barang', ['id' => $id]);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil DiHapus.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal DiHapus.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		echo json_encode(['code' => 200]);
+	}
+
+
+	public function simpanEditSatuan()
+	{
+		$namaKategoriBarangEdit = $this->input->post('namaKategoriBarangEdit');
+		$idEdit = $this->input->post('idEdit');
+		$satuanEdit = $this->input->post('satuanEdit');
+
+		$pros = $this->M_dinamis->update('t_barang', ['id_satuan' => $satuanEdit, 'nama_barang' => $namaKategoriBarangEdit, 'updated_at' => date('Y-m-d H:i:s')], ['id' => $idEdit]);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil DiUbah.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal DiUbah.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect('/KategoriBarang', 'refresh');
+
 	}
 
 
@@ -140,15 +143,16 @@ class Satuan extends CI_Controller {
 
 
 		$sortableColumns = array(
-			0 => 'id',   
-			1 => 'nama_satuan' 
+			0 => 'nama_barang',   
+			1 => 'stok_barang',
+			2 => 'nama_satuan' 
 		);
 
 		$orderColumn = $sortableColumns[$orderColumnIndex];
 
-		$data = $this->M_satuan->get_filtered_data($start, $length, $search, $orderColumn, $orderDirection);
-		$total = $this->M_satuan->get_total_data();
-		$filtered_total = $this->M_satuan->get_filtered_total($search);
+		$data = $this->M_kategoriBarang->get_filtered_data($start, $length, $search, $orderColumn, $orderDirection);
+		$total = $this->M_kategoriBarang->get_total_data();
+		$filtered_total = $this->M_kategoriBarang->get_filtered_total($search);
 
         // Format data sebagai JSON
 		$output = array(
@@ -160,8 +164,5 @@ class Satuan extends CI_Controller {
 
 		echo json_encode($output);
 	}
-
-
-
 
 }

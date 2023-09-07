@@ -108,11 +108,11 @@ class M_dinamis extends CI_Model {
 
     public function insertBatch($table, $data)
     {
-     return $this->db->insert_batch($table, $data); 
- }
+       return $this->db->insert_batch($table, $data); 
+   }
 
- public function getUser()
- {
+   public function getUser()
+   {
     $qry = "SELECT t_users.*, t_role.name AS rollNamae FROM t_users
     INNER JOIN 
     t_role ON t_users.user_roll=t_role.id";
