@@ -10,14 +10,16 @@
         </div>
         <div class="card-body border-bottom py-3">
           <?= $this->session->flashdata('psn'); ?>
-          <table id="" class="table table-bordered">
+          <table id="tabelPermohonan" class="table table-bordered">
             <thead>
               <tr>
                 <th>No</th>
                 <th>Nama Pemohon</th>
                 <th>Jenis Barang</th>
                 <th>Jumlah Barang</th>
+                <th>Jumlah Barang Approv</th>
                 <th>Status Approval</th>
+                <th>Surat <br> Permintaan Barang</th>
                 <th>Catatan Subag TU</th>
                 <th>Aksi</th>
               </tr>
@@ -42,7 +44,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="<?= base_url(); ?>StockBarang/simpanInputBarang" method="POST" enctype="multipart/form-data">
+        <form action="<?= base_url(); ?>PermohonanBarang/simpanPermintaan" method="POST" enctype="multipart/form-data">
           <div class="row">
             <div class="mb-3 col-12">
               <label class="form-label">Jenis Barang</label>
@@ -76,34 +78,38 @@
 <!-- End Modal Tambah -->
 
 <!-- Modal Tambah -->
-<div class="modal modal-blur fade" id="modalEdit">
+<div class="modal modal-blur fade" id="modalAksi">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Data Jenis Barang</h5>
+        <h5 class="modal-title">Form Approval Pengajuan Barang</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form action="<?= base_url(); ?>KategoriBarang/simpanEditSatuan" method="POST">
+          <input type="hidden" name="idEditX" id="idEditX">
           <div class="mb-3">
-            <label class="form-label">Nama Jenis Barang</label>
-            <input type="text" class="form-control" name="namaKategoriBarangEdit" id="namaKategoriBarangEdit" placeholder="Input Nama Kategori Batrang" required>
-            <input type="hidden" name="idEdit" id="idEdit">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Satuan Barang</label>
-            <select class="form-select" name="satuanEdit" id="satuanEdit" required>
+            <label class="form-label">Ubah Status</label>
+            <select class="form-select" name="dataStatus" id="dataStatus" required>
               <option value="" selected disabled>--- Pilih Satuan ---</option>
-              <?php foreach ($datakondisi as $key => $value) { ?>
-                <option value="<?= $value->id; ?>"></option>
+              <?php foreach ($dataStatus as $key => $value) { ?>
+                <option value="<?= $value->id; ?>"><?= $value->nama_status; ?></option>
               <?php } ?>
             </select>
+          </div>
+          <div class="mb-3 col-12">
+            <label class="form-label">Jumlah Barang</label>
+            <input type="text" class="form-control" name="jml_barangApprove" id="jml_barangApprove" placeholder="Input Jumlah Barang" oninput="setTotHarga(); this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+          </div>
+          <div class="mb-3 col-12">
+            <label class="form-label">Keterangan</label>
+            <textarea class="form-control" data-bs-toggle="autosize" name="catatan" placeholder="Input Catatan" style="height: 150px;" required></textarea>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
               Cancel
             </a>
-            <button type="submit" class="btn btn-primary">Simpan</button>
+            <button type="submit" class="btn btn-primary" >Simpan</button>
           </div>
         </form>
       </div>
@@ -115,8 +121,19 @@
 <script>
   $(document).ready(function() {
 
+
+    let prive = '<?= $this->session->userdata('roll'); ?>';
+
     showModalTambah = function () {
       $('#modalTambah').modal('show');
+    }
+
+
+    showModalSubagTu = function (id) {
+
+      $('#idEditX').val(id);
+
+      $('#modalAksi').modal('show');
     }
 
 
@@ -147,7 +164,18 @@
 
     }
 
-    deleteFunction = function (id) {
+    deleteFunction = function (id, sts) {
+
+      if (sts != 'Panding') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal Menghapus Data',
+          text: `Data Gagal dihapus dikarenakan status Approval adalah ${sts}`,
+          confirmButtonText: 'Tutup'
+        });
+        return;
+      }
+
       Swal.fire({
         title: 'Konfirmasi Hapus Data',
         text: 'Apakah Anda yakin ingin menghapus data ini?',
@@ -157,7 +185,7 @@
         cancelButtonText: 'Batal'
       }).then((result) => {
         if (result.isConfirmed) {
-          ajaxUntukSemua(base_url()+'StockBarang/deleteData', {id}, function(data) {
+          ajaxUntukSemua(base_url()+'PermohonanBarang/deleteData', {id}, function(data) {
 
             if (data.code != 200) {
               Swal.fire({
@@ -180,11 +208,11 @@
     }
 
 
-    var dataTable = $('#tPengajuanBarang').DataTable({
+    var dataTable = $('#tabelPermohonan').DataTable({
       "processing": true,
       "serverSide": true,
       "ajax": {
-        "url": "<?php echo base_url('StockBarang/get_data'); ?>",
+        "url": "<?php echo base_url('PermohonanBarang/get_data'); ?>",
         "type": "POST"
       },
       "columns": [
@@ -199,72 +227,65 @@
         "orderable": false,
       },
       {
+        "data": "username_pemohon", 
+        "name": "nama pemohon",
+        "width" : "15%",
+        "class" : "text-center"
+      },
+      {
         "data": "nama_barang", 
-        "name": "nama barang",
-        "width" : "30%",
-        "class" : "text-center"
-      },
-      {
-        "data": "jns_barang", 
         "name": "Jenis Barang",
-        "width" : "30%",
+        "width" : "15%",
         "class" : "text-center"
       },
       {
-        "data": "stok_barang_masuk", 
-        "name": "jumlah barang masuk",
-        "width" : "30%",
+        "data": "jml_barang", 
+        "name": "Jumlah Barang",
+        "width" : "10%",
         "class" : "text-center"
       },
       {
-        "data": "harga_satuan", 
-        "name": "harga satuan",
-        "width" : "30%",
+        "data": "jml_approval", 
+        "name": "Jumlah Barang Approv",
+        "width" : "10%",
         "class" : "text-center"
       },
       {
         "data": null, 
-        "name": "total harga",
-        "width" : "30%",
+        "name": "Status Approve",
+        "width" : "10%",
+        "class" : "text-center",
+        "render": function (data, type, row) {
+          let status  = row.nama_status,
+          cetak = '';
+
+          if(status == 'Panding'){
+            cetak = `<span class="badge rounded-pill bg-warning" style="color: black;"><b>${status}</b></span>`;
+          }else if(status == 'Approve'){
+            cetak = `<span class="badge rounded-pill bg-success"><b>${status}</b></span>`;
+          }else if(status == 'Reject'){
+            cetak = `<span class="badge rounded-pill bg-danger"><b>${status}</b></span>`;
+          }
+          return cetak;
+        }
+      },
+      {
+        "data": null, 
+        "name": "Surat Permintaan Barang",
+        "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
-          let jumlah_barang = data.stok_barang_masuk,
-          harga_satuan = data.harga_satuan,
-          total_harga = jumlah_barang * harga_satuan;
-          return total_harga;
+          return jumlah_barang = `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_permohonanBarang+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`;
         },
         "orderable": false,
       },
       {
-        "data": null, 
-        "name": "Dokumen Faktur",
+        "data": "ctatan_subag", 
+        "name": "catatan Subag Tu",
         "width" : "30%",
         "class" : "text-center",
-        "render": function(data, type, full, meta) {
-          return jumlah_barang = `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_faktur+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`;
-        },
         "orderable": false,
-      },
-      {
-        "data": null, 
-        "name": "Dokumen SPM",
-        "width" : "30%",
-        "class" : "text-center",
-        "render": function(data, type, full, meta) {
-          return jumlah_barang = `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_spm+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`;
-        },
-        "orderable": false,
-      },
-      {
-        "data": null, 
-        "name": "Dokumen SP2D",
-        "width" : "30%",
-        "class" : "text-center",
-        "render": function(data, type, full, meta) {
-          return jumlah_barang = `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_sp2d+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`;
-        },
-        "orderable": false,
-      },        
+      },      
       {
         "data": null,
         "width" : "8%",
@@ -272,7 +293,11 @@
         "orderable": false,
         "render": function (data, type, row) {
           var actions = '';
-          actions += '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ')"><i class="fa-solid fa-trash"></i></button>';
+          if (prive != '3') {
+            actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
+          }else{
+            actions = '<button class="btn btn-icon btn-primary m-1" onclick="showModalSubagTu(' + row.id + ')"><i class="fa-solid fa-file-pen"></i></button>';
+          }
           return actions;
         },
         "orderable": false,
