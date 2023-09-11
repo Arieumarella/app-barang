@@ -139,6 +139,68 @@ class PermohonanBarang extends CI_Controller {
 	}
 
 
+	public function simpanApproval()
+	{
+		$dataStatus = $this->input->post('dataStatus');
+		$jml_barangApprove = $this->input->post('jml_barangApprove');
+		$catatan = $this->input->post('catatan');
+		$idMaster = $this->input->post('idEditX');
+
+
+		if ($dataStatus == '2') {
+			$dataPermintaan = $this->M_dinamis->getById('t_permintaan_barang', ['id' => $idMaster]);
+			$dataStokBarang = $this->M_dinamis->getById('t_barang', ['id' => $dataPermintaan->id_barang]);
+
+			
+
+			if ($jml_barangApprove > $dataStokBarang->stok_barang) {
+				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<strong>Gagal.!</strong> Jumlah Stok Barang Tidak Mencukupi.!
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>');
+				redirect('/PermohonanBarang', 'refresh');
+				return;
+			}
+
+			$jmlStokKurang = $dataStokBarang->stok_barang-$jml_barangApprove;
+
+			$dataUbahPermintaan = array(
+				'status_approval' => $dataStatus,
+				'ctatan_subag' => $catatan,
+				'jml_approval' => $jml_barangApprove,
+				'updated_at' => date('Y-m-d H:i:s')
+			);
+
+			
+			$pros = $this->M_permohonanBarang->prosesApprove($dataUbahPermintaan, $idMaster, $jmlStokKurang, $dataPermintaan->id_barang);
+
+		}else{
+			$dataTidakApprove = array(
+				'status_approval' => $dataStatus,
+				'ctatan_subag' => $catatan,
+				'updated_at' => date('Y-m-d H:i:s')
+			);
+
+			$pros = $this->M_dinamis->update('t_permintaan_barang', $dataTidakApprove, ['id' => $idMaster]);
+		}
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect('/PermohonanBarang', 'refresh');
+
+	}
+
+
 	public function get_data() {
 
 		$draw = $this->input->post('draw');
