@@ -192,6 +192,17 @@
           </div>
         </div>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="<?= base_url(); ?>Login/Logout" >
+          <span class="nav-link-icon d-md-none d-lg-inline-block"><!-- Download SVG icon from http://tabler-icons.io/i/home -->
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </span>
+          
+          <span class="nav-link-title">
+            Logout
+          </span>
+        </a>
+      </li>
     </ul>
   </div>
 </div>

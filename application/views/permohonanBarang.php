@@ -4,9 +4,9 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Data Permohonan Barang</h3>
-          
-          <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
-          
+          <?php if ($this->session->userdata('roll') == '5') { ?>
+            <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
+          <?php } ?>
         </div>
         <div class="card-body border-bottom py-3">
           <?= $this->session->flashdata('psn'); ?>
@@ -19,7 +19,8 @@
                 <th>Jumlah Barang</th>
                 <th>Jumlah Barang Approv</th>
                 <th>Status Approval</th>
-                <th>Surat <br> Permintaan Barang</th>
+                <th>Surat <br> Permohonan Barang</th>
+                <th>Berita Acara <br> Serah Terima <br> (BAST)</th>
                 <th>Catatan Subag TU</th>
                 <th>Aksi</th>
               </tr>
@@ -123,6 +124,12 @@
 
 
     let prive = '<?= $this->session->userdata('roll'); ?>';
+
+
+    showModalUploadBast = function (id) {
+      alert(id);
+    }
+
 
     showModalTambah = function () {
       $('#modalTambah').modal('show');
@@ -275,7 +282,17 @@
         "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
-          return jumlah_barang = `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_permohonanBarang+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`;
+          return jumlah_barang = (data.path_permohonanBarang != null) ? `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_permohonanBarang+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`:``;
+        },
+        "orderable": false,
+      },
+      {
+        "data": null, 
+        "name": "Berita Acara Serah Terima (BAST)",
+        "width" : "10%",
+        "class" : "text-center",
+        "render": function(data, type, full, meta) {
+          return bast = (data.path_bast != null) ? `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_bast+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`:``;
         },
         "orderable": false,
       },
@@ -286,17 +303,21 @@
         "class" : "text-center",
         "orderable": false,
       },      
+
+
       {
         "data": null,
         "width" : "8%",
         "class" : "text-center",
         "orderable": false,
         "render": function (data, type, row) {
-          var actions = '';
-          if (prive != '3') {
+          let actions = '';
+          if (prive == '5') {
             actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
-          }else{
+          }else if (prive == '3'){
             actions = '<button class="btn btn-icon btn-primary m-1" onclick="showModalSubagTu(' + row.id + ')"><i class="fa-solid fa-file-pen"></i></button>';
+          }else if (prive == '4'){
+            actions = `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`;
           }
           return actions;
         },

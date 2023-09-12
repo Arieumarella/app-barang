@@ -4,7 +4,9 @@
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Data Jenis Barang</h3>
-          <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
+          <?php if ($this->session->userdata('roll') == '4') { ?>
+            <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
+          <?php } ?>
         </div>
         <div class="card-body border-bottom py-3">
           <?= $this->session->flashdata('psn'); ?>
@@ -105,6 +107,8 @@
 <script>
   $(document).ready(function() {
 
+    let prive = '<?= $this->session->userdata('roll'); ?>';
+
     showModalTambah = function () {
       $('#modalTambah').modal('show');
     }
@@ -190,9 +194,15 @@
         "class" : "text-center",
         "orderable": false,
         "render": function (data, type, row) {
-          var actions = '<button class="btn btn-icon btn-sm btn-warning" onclick="editFunction(' + row.id + ')"><i class="fa-solid fa-pen-to-square"></i></button>';
-          actions += '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ')"><i class="fa-solid fa-trash"></i></button>';
-          return actions;
+
+          if (prive == '4') {
+
+            var actions = '<button class="btn btn-icon btn-sm btn-warning" onclick="editFunction(' + row.id + ')"><i class="fa-solid fa-pen-to-square"></i></button>';
+            actions += '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ')"><i class="fa-solid fa-trash"></i></button>';
+            return actions;
+          }else{
+            return '';
+          }
         }
       }
       ]
