@@ -48,21 +48,27 @@
         <form action="<?= base_url(); ?>PermohonanBarang/simpanPermintaan" method="POST" enctype="multipart/form-data">
           <div class="row">
             <div class="mb-3 col-12">
-              <label class="form-label">Jenis Barang</label>
-              <select class="form-select" name="jns_barang" id="jns_barang" required>
-                <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
-                <?php foreach ($dataJnsBarang as $key => $value) { ?>
-                  <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
-                <?php } ?>
-              </select>
-            </div>
-            <div class="mb-3 col-12">
-              <label class="form-label">Jumlah Barang</label>
-              <input type="text" class="form-control" name="jml_barang" id="jml_barang" placeholder="Input Jumlah Barang" oninput="setTotHarga(); this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
-            </div>
-            <div class="mb-3 col-12">
               <div class="form-label">Surat Permohonan Barang</div>
               <input type="file" class="form-control" name="permohonanBarang" required>
+            </div>
+            <hr class="mt-3" >
+            <div id="contentFormPermohonan">
+              <div class="mb-3 col-12" style="margin-top: -20px;">
+                <label class="form-label">Jenis Barang</label>
+                <select class="form-select" name="jns_barang[]" id="jns_barang" required>
+                  <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
+                  <?php foreach ($dataJnsBarang as $key => $value) { ?>
+                    <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
+                  <?php } ?>
+                </select>
+              </div>
+              <div class="mb-3 col-12">
+                <label class="form-label">Jumlah Barang</label>
+                <input type="text" class="form-control" name="jml_barang[]" id="jml_barang" placeholder="Input Jumlah Barang" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+              </div>
+            </div>
+            <div class="mb-3 text-end">
+              <button type="button" class="btn btn-dark" onclick="tambahRow();">+</button>
             </div>
             <div class="modal-footer">
               <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
@@ -100,7 +106,7 @@
           </div>
           <div class="mb-3 col-12">
             <label class="form-label">Jumlah Barang</label>
-            <input type="text" class="form-control" name="jml_barangApprove" id="jml_barangApprove" placeholder="Input Jumlah Barang" oninput="setTotHarga(); this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+            <input type="number" class="form-control" name="jml_barangApprove" id="jml_barangApprove" placeholder="Input Jumlah Barang" oninput="setTotHarga(); this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required max="5">
           </div>
           <div class="mb-3 col-12">
             <label class="form-label">Keterangan</label>
@@ -126,6 +132,26 @@
     let prive = '<?= $this->session->userdata('roll'); ?>';
 
 
+    tambahRow = function () {
+
+      let html = ` <div class="mb-3 col-12">
+      <label class="form-label">Jenis Barang</label>
+      <select class="form-select" name="jns_barang[]" required>
+      <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
+      <?php foreach ($dataJnsBarang as $key => $value) { ?>
+        <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
+      <?php } ?>
+      </select>
+      </div>
+      <div class="mb-3 col-12">
+      <label class="form-label">Jumlah Barang</label>
+      <input type="text" class="form-control" name="jml_barang[]" placeholder="Input Jumlah Barang" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
+      </div> 
+      </div>`;
+
+      $("#contentFormPermohonan").append(html);
+    }
+
     showModalUploadBast = function (id) {
       alert(id);
     }
@@ -136,9 +162,10 @@
     }
 
 
-    showModalSubagTu = function (id) {
+    showModalSubagTu = function (id, jml_max) {
 
       $('#idEditX').val(id);
+      $("#jml_barangApprove").attr("max", jml_max);
 
       $('#modalAksi').modal('show');
     }
@@ -315,7 +342,7 @@
           if (prive == '5') {
             actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
           }else if (prive == '3'){
-            actions = '<button class="btn btn-icon btn-primary m-1" onclick="showModalSubagTu(' + row.id + ')"><i class="fa-solid fa-file-pen"></i></button>';
+            actions = '<button class="btn btn-icon btn-primary m-1" onclick="showModalSubagTu(' + row.id + ', '+ row.jml_barang +')"><i class="fa-solid fa-file-pen"></i></button>';
           }else if (prive == '4'){
             actions = `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`;
           }
