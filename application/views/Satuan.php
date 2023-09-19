@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Data Satuan</h3>
+          <h3 class="card-title">Data Referensi Satuan Barang</h3>
           <?php if ($this->session->userdata('roll') == '4') { ?>
             <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
           <?php } ?>

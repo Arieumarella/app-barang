@@ -3,7 +3,7 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">Data Jenis Barang</h3>
+          <h3 class="card-title">Data Referensi Nama Barang</h3>
           <?php if ($this->session->userdata('roll') == '4') { ?>
             <button class="btn btn-primary ms-auto " onclick="showModalTambah();"><i class="fa-solid fa-plus" style="margin-right: 5px;"></i> Tambah Data</button>
           <?php } ?>
@@ -183,10 +183,11 @@
         "class" : "text-center"
       },
       {
-        "data": "stok_barang", 
+        "data": "jml_stock", 
         "name": "Jumlah Stok Barang",
         "width" : "30%",
-        "class" : "text-center"
+        "class" : "text-center",
+        "orderable": false,
       },
       {
         "data": null,

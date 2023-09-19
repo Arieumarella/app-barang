@@ -46,28 +46,55 @@ class StockBarang extends CI_Controller {
 	}
 
 
+	public function detail($id=null)
+	{
+		if ($id == null) {
+			
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				Invalid parameter.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+
+			redirect('/StockBarang', 'refresh');
+		}
+
+
+		$tmp = array(
+			'tittle' => 'Input Stock Barang',
+			'header_content' => 'header2',
+			'footer_content' => 'footer',
+			'sidebar' => 'sidebar-left',
+			'content' => 'detailBarang',
+			'datakondisi' => $this->M_barang->getDataDetail($id),
+			'dataFaktur' => $this->M_dinamis->getById('t_faktur', ['id' => $id])
+		);
+
+		$this->load->view('tamplate/baseTamplate', $tmp);
+
+	}
+
+
 	public function simpanInputBarang()
 	{
+
+		
+
+		$noFaktur = $this->input->post('noFaktur');
+		$tglFaktur = $this->input->post('tglFaktur');
+		$arrayDate = explode('/',$tglFaktur);
+		$nmFileGagalUpload ='';
+		$username = $this->session->userdata('username');
 		$jns_barang = $this->input->post('jns_barang');
 		$namaKategoriBarang = $this->input->post('namaKategoriBarang');
 		$kon_barang = $this->input->post('kon_barang');
 		$jml_barang = $this->input->post('jml_barang');
 		$hrg_satuan = $this->input->post('hrg_satuan');
-		$noBukti = $this->input->post('noBukti');
-		$tglMasuk = $this->input->post('tglMasuk');
-		$arrayDate = explode('/',$tglMasuk);
-		$catatan = $this->input->post('catatan');
-		$username = $this->session->userdata('username');
-		$nmFileGagalUpload ='';
 
-		$dataInsert = array(
-			'id_kategori_barang' => $jns_barang,
-			'id_kondisi_barang' => $kon_barang,
-			'nama_barang' => $namaKategoriBarang,
-			'harga_satuan' => $hrg_satuan,
-			'stok_barang_masuk' => $jml_barang,
-			'tgl_bukti' => $arrayDate[2].'-'.$arrayDate[0].'-'.$arrayDate[1],
-			'keterangan' => $catatan,
+
+
+		$dataInsertFaktur = array(
+			'no_faktur' => $noFaktur,
+			'tgl_faktur' => $arrayDate[2].'-'.$arrayDate[0].'-'.$arrayDate[1],
 			'created_at' => date('Y-m-d H:i:s')
 		);
 
@@ -75,13 +102,11 @@ class StockBarang extends CI_Controller {
 		$arrayFile = array(
 			'faktur' => 'Dokumen Faktru',
 			'SPM' => 'Dokumen SPM',
-			'SP2D' => 'Dokumen SP2D'
 		);
 
 		$arrayTypKolom = array(
-			'faktur' => 'path_faktur',
-			'SPM' => 'path_spm',
-			'SP2D' => 'path_sp2d'
+			'faktur' => 'dok_faktur',
+			'SPM' => 'dok_spm',
 		);
 
 		$config['allowed_types'] = 'pdf';
@@ -131,13 +156,13 @@ class StockBarang extends CI_Controller {
 					$namaFile = $upload_data['file_name'];
 					$fullPath = $upload_data['full_path'];
 
-					$dataInsert["$arrayTypKolom[$key]"] = $fullPath;
+					$dataInsertFaktur["$arrayTypKolom[$key]"] = $fullPath;
 					
 				}
 			}
 		}
 
-		$pros = $this->M_barang->simpanBarang($dataInsert, $jml_barang, $jns_barang);
+		$pros = $this->M_barang->simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan);
 
 		if ($pros) {
 			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -160,16 +185,15 @@ class StockBarang extends CI_Controller {
 		
 		$id = $this->input->post('id');
 
-		$dataMaster = $this->M_dinamis->getById('t_stok_barang', ['id' => $id]);
-		$dataStock = $this->M_dinamis->getById('t_barang', ['id' => $dataMaster->id_kategori_barang]);
+		$dataMaster = $this->M_dinamis->getById('t_stok_barang', ['id_faktur' => $id, 'terpakai' => '1']);
 
-		if ($dataMaster->stok_barang_masuk > $dataStock->stok_barang) {
-			echo json_encode(['code' => '401', 'msg' => 'Jumlah Stock barang yang ada sekarang kurang dari data yang ingin dihapus.!']);
+		if ($dataMaster != null) {
+			echo json_encode(['code' => '401', 'msg' => 'Ada barang yang telah Digunakan.!']);
 			return;
 		}
 
-		$this->M_dinamis->update('t_barang', ['stok_barang' => $dataStock->stok_barang-$dataMaster->stok_barang_masuk], ['id' => $dataMaster->id_kategori_barang]);
-		$this->M_dinamis->delete('t_stok_barang', ['id' => $id]);
+		$this->M_dinamis->delete('t_stok_barang', ['id_faktur' => $id]);
+		$this->M_dinamis->delete('t_faktur', ['id' => $id]);
 
 		$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
 			<strong>Berhasil.!</strong> Data berhasil Dihapus.!
@@ -193,11 +217,9 @@ class StockBarang extends CI_Controller {
 
 
 		$sortableColumns = array(
-			0 => 't_stok_barang.nama_barang',   
-			1 => 't_barang.nama_barang',
-			2 => 'harga_satuan' ,
-			3 => 'stok_barang_masuk',
-			4 => 'tgl_bukti'
+			0 => 't_faktur.no_faktur',   
+			1 => 't_faktur.tgl_faktur',
+			2 => 'total_hargaX'
 		);
 
 		$orderColumn = $sortableColumns[$orderColumnIndex];

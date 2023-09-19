@@ -3,16 +3,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_barang extends CI_Model {
 
-	public function simpanBarang($dataInsert, $jml_barang, $jns_barang)
+	public function simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan)
 	{
 		$this->db->trans_begin();
 
-		$data = $this->db->get_where('t_barang', ['id' => $jns_barang])->row();
+		$this->db->insert('t_faktur', $dataInsertFaktur);
 
-		$this->db->where(['id' => $jns_barang]);
-		$this->db->update('t_barang', ['stok_barang' => $data->stok_barang+$jml_barang]);
+		$last_id = $this->db->insert_id();
 
-		$this->db->insert('t_stok_barang', $dataInsert);
+		foreach ($jns_barang as $key => $value) {
+
+
+			$jumlah_iterasi = (int)$jml_barang[$key];
+
+			for ($i = 0; $i < $jumlah_iterasi; $i++) {
+
+				$dataInsert = array(
+					'id_kategori_barang' => $jns_barang[$key], 
+					'id_kondisi_barang' => $kon_barang[$key],
+					'id_faktur' => $last_id,
+					'nama_barang' =>  $namaKategoriBarang[$key],
+					'harga_satuan' => $hrg_satuan[$key],
+					'created_at' => date('Y-m-d H:i:s')
+				);
+				$this->db->insert('t_stok_barang', $dataInsert);
+
+			}
+		}
+
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
@@ -23,18 +41,29 @@ class M_barang extends CI_Model {
 		}
 	}
 
+	public function getDataDetail($id)
+	{
+		$qry = "SELECT a.*, b.nama_barang AS jns_barang FROM 
+		(
+			SELECT id_kategori_barang, id_kondisi_barang, nama_barang, harga_satuan, COUNT(*) AS jml_barang FROM t_stok_barang WHERE id_faktur='$id' GROUP BY id_kategori_barang
+			) AS a
+		LEFT JOIN
+		(
+			SELECT id, nama_barang FROM t_barang
+		) AS b ON a.id_kategori_barang=b.id";
+
+		return $this->db->query($qry)->result();
+	}
+
 	public function get_filtered_data($start, $length, $search, $orderColumn, $orderDirection) {
-		$this->db->select('t_stok_barang.*, t_barang.nama_barang as jns_barang');
-		$this->db->from('t_stok_barang');
-		$this->db->join('t_barang', 't_stok_barang.id_kategori_barang = t_barang.id', 'left');
+		$this->db->select('t_faktur.*, a.total_hargaX');
+		$this->db->from('t_faktur');
+		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang WHERE terpakai='0' GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
 
 		if (!empty($search)) {
-			$this->db->like('t_stok_barang.nama_barang', $search);
-			$this->db->or_like('t_stok_barang.harga_satuan', $search);
-			$this->db->or_like('t_stok_barang.stok_barang_masuk', $search);
-			$this->db->or_like('t_stok_barang.tgl_bukti', $search);
-			$this->db->or_like('t_stok_barang.keterangan', $search);
-			$this->db->or_like('t_barang.nama_barang', $search);
+			$this->db->like('t_faktur.no_faktur', $search);
+			$this->db->or_like('t_faktur.tgl_faktur', $search);
+			$this->db->or_like('a.total_hargaX', $search);
 		}
 
 		if (!empty($orderColumn) && !empty($orderDirection)) {
@@ -52,16 +81,12 @@ class M_barang extends CI_Model {
 	}
 
 	public function get_filtered_total($search) {
-		$this->db->from('t_stok_barang');
-		$this->db->join('t_barang', 't_stok_barang.id_kategori_barang = t_barang.id', 'left');
+		$this->db->from('t_faktur');
+		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang WHERE terpakai='0' GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
 
 		if (!empty($search)) {
-			$this->db->like('t_stok_barang.nama_barang', $search);
-			$this->db->or_like('t_stok_barang.harga_satuan', $search);
-			$this->db->or_like('t_stok_barang.stok_barang_masuk', $search);
-			$this->db->or_like('t_stok_barang.tgl_bukti', $search);
-			$this->db->or_like('t_stok_barang.keterangan', $search);
-			$this->db->or_like('t_barang.nama_barang', $search);
+			$this->db->like('t_faktur.no_faktur', $search);
+			$this->db->or_like('t_faktur.tgl_faktur', $search);
 		}
 
 		return $this->db->count_all_results();

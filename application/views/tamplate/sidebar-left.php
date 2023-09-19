@@ -177,10 +177,10 @@
           <div class="dropdown-menu-columns">
             <div class="dropdown-menu-column">
               <a class="dropdown-item" href="<?= base_url(); ?>KategoriBarang">
-                Janis Barang
+                Referensi Nama Barang
               </a>
               <a class="dropdown-item" href="<?= base_url(); ?>Satuan">
-                Satuan Barang
+                Referensi Satuan Barang
               </a>
               <a class="dropdown-item" href="<?= base_url(); ?>StockBarang">
                 Input Data Barang Masuk
