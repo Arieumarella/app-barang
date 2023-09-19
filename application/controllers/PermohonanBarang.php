@@ -53,11 +53,9 @@ class PermohonanBarang extends CI_Controller {
 		$username = $this->session->userdata('username');
 		$nmFileGagalUpload = '';
 
-		$dataArray = array(
-			'id_barang' => $jns_barang,
-			'username_pemohon' => $username, 
-			'jml_barang' => $jml_barang,
-			'status_approval' => '1',
+		$inputDataMaster = array(
+			'username_pemohon' => $username,
+			'tgl_pengajuan' => date('Y-m-d H:i:s'),
 			'created_at' => date('Y-m-d H:i:s')
 		);
 
@@ -98,9 +96,9 @@ class PermohonanBarang extends CI_Controller {
 			$upload_data = $this->upload->data();
 			$namaFile = $upload_data['file_name'];
 			$fullPath = $upload_data['full_path'];
-			$dataArray["path_permohonanBarang"] = $fullPath;
+			$inputDataMaster["path_permohonanBarang"] = $fullPath;
 
-			$pros = $this->M_dinamis->save('t_permintaan_barang', $dataArray );
+			$pros = $this->M_permohonanBarang->simpanData($inputDataMaster, $jns_barang, $jml_barang);
 
 			if ($pros) {
 				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -213,12 +211,9 @@ class PermohonanBarang extends CI_Controller {
 
 
 		$sortableColumns = array(
-			0 => 'nama_barang',   
-			1 => 'username_pemohon',
-			2 => 'jml_barang' ,
-			3 => 'nama_status',
-			4 => 'jml_approval',
-			5 => 'nama_status'
+			0 => 'username_pemohon',   
+			1 => 'tgl_pengajuan',
+			2 => 'status_review'
 		);
 
 		$orderColumn = $sortableColumns[$orderColumnIndex];

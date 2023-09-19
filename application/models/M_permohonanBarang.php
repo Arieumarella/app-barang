@@ -24,25 +24,53 @@ class M_permohonanBarang extends CI_Model {
 		}
 	}
 
+
+	public function simpanData($inputDataMaster, $jns_barang, $jml_barang)
+	{
+		$this->db->trans_begin();
+
+		$this->db->insert('t_master_permohonan_barang', $inputDataMaster);
+
+		$last_id = $this->db->insert_id();
+
+		foreach ($jns_barang as $key => $value) {
+			
+			$dataInsert = array(
+				'id_master' => $last_id,
+				'id_jns_barang' => $jns_barang[$key],
+				'jml_barang' => $jml_barang[$key],
+				'created_at' => date('Y-m-d H:i:s')
+			);
+
+			$this->db->insert('t_detail_permohonan_barang', $dataInsert);
+
+		}
+
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return FALSE;
+		} else {
+			$this->db->trans_commit();
+			return true;
+		}
+	}
+
 	public function get_filtered_data($start, $length, $search, $orderColumn, $orderDirection) {
 
 		$prive = $this->session->userdata('roll');
 
-		$this->db->select('t_permintaan_barang.*, t_barang.nama_barang, t_sts_approval.nama_status');
-		$this->db->from('t_permintaan_barang');
-		$this->db->join('t_barang', 't_permintaan_barang.id_barang = t_barang.id', 'left');
-		$this->db->join('t_sts_approval', 't_permintaan_barang.status_approval = t_sts_approval.id', 'left');
+		$this->db->select('*');
+		$this->db->from('t_master_permohonan_barang');
 
 		if (!empty($search)) {
-			$this->db->like('t_permintaan_barang.username_pemohon', $search);
-			$this->db->or_like('t_permintaan_barang.jml_barang', $search);
-			$this->db->or_like('t_permintaan_barang.jml_approval', $search);
-			$this->db->or_like('t_barang.nama_barang', $search);
-			$this->db->or_like('t_sts_approval.nama_status', $search);
+			$this->db->like('username_pemohon', $search);
+			$this->db->or_like('tgl_pengajuan', $search);
+			$this->db->or_like('status_review', $search);
 		}
 
 		if ($prive == '2') {
-			$this->db->where('t_permintaan_barang.username_pemohon', $this->session->userdata('username'));
+			$this->db->where('t_master_permohonan_barang.username_pemohon', $this->session->userdata('username'));
 		}
 
 		if (!empty($orderColumn) && !empty($orderDirection)) {
@@ -59,31 +87,27 @@ class M_permohonanBarang extends CI_Model {
 		$prive = $this->session->userdata('roll');
 
 		if ($prive == '2') {
-			$this->db->where('t_permintaan_barang.username_pemohon', $this->session->userdata('username'));
+			$this->db->where('t_master_permohonan_barang.username_pemohon', $this->session->userdata('username'));
 		}
 
-		return $this->db->count_all('t_permintaan_barang');
+		return $this->db->count_all('t_master_permohonan_barang');
 	}
 
 	public function get_filtered_total($search) {
 
 		$prive = $this->session->userdata('roll');
 
-		$this->db->select('t_permintaan_barang,  t_barang.nama_barang, t_sts_approval.nama_status');
-		$this->db->from('t_permintaan_barang');
-		$this->db->join('t_barang', 't_permintaan_barang.id_barang = t_barang.id', 'left');
-		$this->db->join('t_sts_approval', 't_permintaan_barang.status_approval = t_sts_approval.id', 'left');
+		$this->db->select('*');
+		$this->db->from('t_master_permohonan_barang');
 
 		if (!empty($search)) {
-			$this->db->like('t_permintaan_barang.username_pemohon', $search);
-			$this->db->or_like('t_permintaan_barang.jml_barang', $search);
-			$this->db->or_like('t_permintaan_barang.jml_approval', $search);
-			$this->db->or_like('t_barang.nama_barang', $search);
-			$this->db->or_like('t_sts_approval.nama_status', $search);
+			$this->db->like('username_pemohon', $search);
+			$this->db->or_like('tgl_pengajuan', $search);
+			$this->db->or_like('status_review', $search);
 		}
 
 		if ($prive == '2') {
-			$this->db->where('t_permintaan_barang.username_pemohon', $this->session->userdata('username'));
+			$this->db->where('t_master_permohonan_barang.username_pemohon', $this->session->userdata('username'));
 		}
 
 		return $this->db->count_all_results();

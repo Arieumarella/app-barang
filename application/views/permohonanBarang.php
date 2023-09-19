@@ -15,13 +15,10 @@
               <tr>
                 <th>No</th>
                 <th>Nama Pemohon</th>
-                <th>Jenis Barang</th>
-                <th>Jumlah Barang</th>
-                <th>Jumlah Barang Approv</th>
-                <th>Status Approval</th>
-                <th>Surat <br> Permohonan Barang</th>
-                <th>Berita Acara <br> Serah Terima <br> (BAST)</th>
-                <th>Catatan Subag TU</th>
+                <th>Tanggal Pengajuan</th>
+                <th>Status Review</th>
+                <th>Surat Permohonan</th>
+                <th>BAST</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -260,52 +257,41 @@
         },
         "orderable": false,
       },
-      {
-        "data": "username_pemohon", 
+      { 
+        "data": null, 
         "name": "nama pemohon",
         "width" : "15%",
-        "class" : "text-center"
+        "class" : "text-center",
+        "render": function (data, type, row, meta) {
+          return `<a href="<?= base_url(); ?>/PermohonanBarang/deleteData/${row.id}">${row.username_pemohon}</a>`;
+        }
       },
       {
-        "data": "nama_barang", 
-        "name": "Jenis Barang",
-        "width" : "15%",
-        "class" : "text-center"
-      },
-      {
-        "data": "jml_barang", 
-        "name": "Jumlah Barang",
-        "width" : "10%",
-        "class" : "text-center"
-      },
-      {
-        "data": "jml_approval", 
-        "name": "Jumlah Barang Approv",
+        "data": "tgl_pengajuan", 
+        "name": "Tanggal Pengajuan",
         "width" : "10%",
         "class" : "text-center"
       },
       {
         "data": null, 
-        "name": "Status Approve",
+        "name": "STATUS REVIEW",
         "width" : "10%",
         "class" : "text-center",
         "render": function (data, type, row) {
-          let status  = row.nama_status,
+          let status  = row.status_review,
           cetak = '';
 
-          if(status == 'Panding'){
-            cetak = `<span class="badge rounded-pill bg-warning" style="color: black;"><b>${status}</b></span>`;
-          }else if(status == 'Approve'){
-            cetak = `<span class="badge rounded-pill bg-success"><b>${status}</b></span>`;
-          }else if(status == 'Reject'){
-            cetak = `<span class="badge rounded-pill bg-danger"><b>${status}</b></span>`;
+          if(status == '0'){
+            cetak = `<span class="badge rounded-pill bg-warning" style="color: black;"><b>Belum Di Review</b></span>`;
+          }else if(status == '1'){
+            cetak = `<span class="badge rounded-pill bg-success"><b>Telah Di Review</b></span>`;
           }
           return cetak;
         }
       },
       {
         "data": null, 
-        "name": "Surat Permintaan Barang",
+        "name": "SURAT PERMOHONAN",
         "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
@@ -315,7 +301,7 @@
       },
       {
         "data": null, 
-        "name": "Berita Acara Serah Terima (BAST)",
+        "name": "BAST",
         "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
@@ -323,15 +309,6 @@
         },
         "orderable": false,
       },
-      {
-        "data": "ctatan_subag", 
-        "name": "catatan Subag Tu",
-        "width" : "30%",
-        "class" : "text-center",
-        "orderable": false,
-      },      
-
-
       {
         "data": null,
         "width" : "8%",
