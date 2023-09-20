@@ -318,8 +318,6 @@
           let actions = '';
           if (prive == '5') {
             actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
-          }else if (prive == '3'){
-            actions = '<button class="btn btn-icon btn-primary m-1" onclick="showModalSubagTu(' + row.id + ', '+ row.jml_barang +')"><i class="fa-solid fa-file-pen"></i></button>';
           }else if (prive == '4'){
             actions = `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`;
           }
