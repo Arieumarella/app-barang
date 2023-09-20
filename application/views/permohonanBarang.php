@@ -263,7 +263,7 @@
         "width" : "15%",
         "class" : "text-center",
         "render": function (data, type, row, meta) {
-          return `<a href="<?= base_url(); ?>/PermohonanBarang/deleteData/${row.id}">${row.username_pemohon}</a>`;
+          return `<a href="<?= base_url(); ?>/PermohonanBarang/detailPermohonan/${row.id}">${row.username_pemohon}</a>`;
         }
       },
       {

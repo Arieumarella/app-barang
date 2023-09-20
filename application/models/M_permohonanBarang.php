@@ -114,4 +114,116 @@ class M_permohonanBarang extends CI_Model {
 	}
 
 
+	public function getDetailbarang($id)
+	{
+		$qry = "SELECT a.*, b.nama_barang, stock_barangX FROM 
+		(SELECT * FROM t_detail_permohonan_barang WHERE id_master='$id') AS a
+		LEFT JOIN
+		(SELECT id, nama_barang FROM t_barang) AS b ON a.id_jns_barang=b.id
+		LEFT JOIN
+		(SELECT id_kategori_barang, COUNT(*) AS stock_barangX FROM t_stok_barang WHERE terpakai='0' GROUP BY id_kategori_barang) AS c
+		ON a.id_jns_barang=c.id_kategori_barang
+		";
+
+		return $this->db->query($qry)->result();
+
+	}
+
+
+	public function getStockBarang($id)
+	{
+		$qry = "SELECT COUNT(*) AS jml_stock FROM t_stok_barang WHERE terpakai='0' AND id_kategori_barang='$id'";
+
+		return $this->db->query($qry)->row();
+	}
+
+
+
+	public function prosesAprrovelBarangKeluar($idMaster, $sts_aprroval, $jml_barang, $id_jns_barang, $catatan, $idDetail)
+	{
+		
+
+		$this->db->trans_begin();
+
+		foreach ($sts_aprroval as $key => $value) {
+
+			
+			// Proses Ketika Panding/Reject
+			if ($sts_aprroval[$key] == '0' or $sts_aprroval[$key] == '2') {
+
+				$dataArryDetail = array(
+					'sts_approval' => $sts_aprroval[$key],
+					'catatan' => $catatan[$key]
+				);
+
+				$this->db->where(['id' => $idDetail[$key]]);
+				$this->db->update('t_detail_permohonan_barang', $dataArryDetail);
+
+
+			}
+			// End Proses Ketika Panding/Reject
+
+
+			// Proses Ketika Approve
+			if ($sts_aprroval[$key] == '1') {
+
+				$data = $this->db->get_where('t_detail_permohonan_barang', ['id' => $idDetail[$key]])->row();
+
+				if ($data->sts_approval != '1') {
+					$data = $this->db->query("SELECT * FROM t_stok_barang WHERE id_kategori_barang='$id_jns_barang[$key]' AND terpakai='0' ORDER BY created_at ASC LIMIT $jml_barang[$key] ")->result();
+
+					foreach ($data as $keyApprove => $valApprove) {
+
+						$dataUpdateStockBarang = array(
+							'terpakai' => '1',
+							'tgl_terpakai' => date('Y-m-d H:i:s')
+						);
+
+						$this->db->where(['id' => $valApprove->id]);
+						$this->db->update('t_stok_barang', $dataUpdateStockBarang);
+					}
+
+
+
+					$dataArryDetail = array(
+						'sts_approval' => $sts_aprroval[$key],
+						'jml_barang_approve' => $jml_barang[$key],
+						'catatan' => $catatan[$key]
+					);
+
+					$this->db->where(['id' => $idDetail[$key]]);
+					$this->db->update('t_detail_permohonan_barang', $dataArryDetail);
+				}
+
+			}
+			// End Proses Ketika Approve
+
+		}
+
+		// Update Data Maseter
+		$data = $this->db->get_where('t_detail_permohonan_barang', ['id_master' => $idMaster, 'sts_approval' => '0'])->row();
+
+		if ($data == null) {
+			
+			$dataArryDetailX = array(
+				'status_review' => '1'
+			);
+
+			$this->db->where(['id' => $idMaster]);
+			$this->db->update('t_master_permohonan_barang', $dataArryDetailX);
+		}
+		// End Update Data Maseter
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return FALSE;
+		} else {
+			$this->db->trans_commit();
+			return true;
+		}
+
+
+	}
+
+
 }

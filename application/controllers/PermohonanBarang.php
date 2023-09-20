@@ -189,7 +189,7 @@ class PermohonanBarang extends CI_Controller {
 				</div>');
 		}else{
 			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<strong>Gagal.!</strong> Data Gagal Disimpan.!
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>');
 		}
@@ -231,6 +231,73 @@ class PermohonanBarang extends CI_Controller {
 		);
 
 		echo json_encode($output);
+	}
+
+
+	public function detailPermohonan($id=NULL)
+	{
+		if ($id==null) {
+			
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				Invalid Parameter.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+
+			redirect('/PermohonanBarang', 'refresh');
+		}
+
+		$tmp = array(
+			'tittle' => 'Permohonan Barang',
+			'header_content' => 'header2',
+			'footer_content' => 'footer',
+			'sidebar' => 'sidebar-left',
+			'content' => 'detailPermohonanBarang',
+			'dataRekap' => $this->M_permohonanBarang->getDetailbarang($id),
+			'idMaster' => $id,
+			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id])
+		);
+
+		$this->load->view('tamplate/baseTamplate', $tmp);
+
+	}
+
+
+	public function getDataStockBarang()
+	{
+		$id = $this->input->post('id_jns_barangX');
+
+		$data = $this->M_permohonanBarang->getStockBarang($id);
+
+		echo json_encode($data); 
+
+	}
+
+
+	public function simpanApprove()
+	{
+		$idMaster = $this->input->post('idMaster');
+		$sts_aprroval = $this->input->post('sts_aprroval');
+		$jml_barang = $this->input->post('jml_barang');
+		$id_jns_barang = $this->input->post('id_jns_barang');
+		$catatan = $this->input->post('catatan');
+		$idDetail = $this->input->post('idDetail');
+
+		$pros = $this->M_permohonanBarang->prosesAprrovelBarangKeluar($idMaster, $sts_aprroval, $jml_barang, $id_jns_barang, $catatan, $idDetail);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Gagal.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect("/PermohonanBarang/detailPermohonan/$idMaster", 'refresh');
+
 	}
 
 
