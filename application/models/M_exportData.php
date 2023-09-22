@@ -14,5 +14,15 @@ class M_exportData extends CI_Model {
 	}
 
 
+	public function getDataAwalBarang()
+	{
+		$qry = "SELECT t_barang.*, t_satuan.nama_satuan FROM t_barang
+		LEFT JOIN
+		t_satuan ON t_barang.id_satuan=t_satuan.id";
+
+		return $this->db->query($qry)->result();
+	}
+
+
 
 }
