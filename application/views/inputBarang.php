@@ -58,11 +58,11 @@
             <div class="col-6">
               <div class="mb-3 col-12">
                 <div class="form-label">Dokumen Faktur</div>
-                <input type="file" class="form-control" name="faktur" required>
+                <input type="file" class="form-control" name="faktur" accept=".pdf" required>
               </div>
               <div class="mb-3 col-12">
                 <div class="form-label">Dokumen SPM</div>
-                <input type="file" class="form-control" name="SPM" required>
+                <input type="file" class="form-control" name="SPM" accept=".pdf" required>
               </div>
             </div>
 

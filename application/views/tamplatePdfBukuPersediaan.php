@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Template Landscape</title>
+    <title>Laporan Buku Persediaan Barang</title>
     <style>
         @page {
             size: landscape;

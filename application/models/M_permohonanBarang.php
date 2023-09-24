@@ -226,4 +226,12 @@ class M_permohonanBarang extends CI_Model {
 	}
 
 
+	public function getStockBarangById($id)
+	{
+		$qry = "SELECT COUNT(*) AS jml_stock FROM t_stok_barang WHERE id_kategori_barang='$id' AND terpakai='0'";
+
+		return $this->db->query($qry)->row();;
+	}
+
+
 }

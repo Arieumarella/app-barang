@@ -26,6 +26,7 @@ class Home extends CI_Controller {
 		}
 
 		$this->load->model('M_dinamis');
+		$this->load->model('M_home');
 	}
 
 
@@ -38,6 +39,11 @@ class Home extends CI_Controller {
 			'footer_content' => 'footer',
 			'sidebar' => 'sidebar-left',
 			'content' => 'Home',
+			'jns_barang' => $this->M_home->getJmlBarang(),
+			'blm_review' => $this->M_home->getJumlhBeluTeriview(),
+			'terreview' => $this->M_home->getJumlhTeriview(),
+			'sisaSaldo' => $this->M_home->saldoSaatIni(),
+			'datatable' => $this->M_home->dataTabel()
 		);
 
 		$this->load->view('tamplate/baseTamplate', $tmp);

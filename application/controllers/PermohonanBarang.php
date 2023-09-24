@@ -301,4 +301,73 @@ class PermohonanBarang extends CI_Controller {
 	}
 
 
+	public function getSockBarangById()
+	{
+		$id = $this->input->post('id');
+
+		$data = $this->M_permohonanBarang->getStockBarangById($id);
+
+		echo json_encode($data);
+	}
+
+	public function uploadBast()
+	{
+		$id = $this->input->post('idBarangBAST');
+
+
+		if (!file_exists('./assets/upload Dokumen BAST')) {
+			mkdir('./assets/upload Dokumen BAST');
+		}
+
+
+		$path = "./assets/upload Dokumen BAST/";
+
+		$pathX = $_FILES['bast']['name'];
+		$ext = pathinfo($pathX, PATHINFO_EXTENSION);
+
+
+		$config['upload_path'] = $path;
+		$config['allowed_types'] = 'pdf';
+		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
+		$config['max_size'] = 100000;
+
+		$this->load->library('upload', $config);
+
+		if (!$this->upload->do_upload('bast')){
+
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan dengan alasan '.$this->upload->display_errors().'
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+
+			redirect('/PermohonanBarang', 'refresh');
+
+		}else{
+
+			$upload_data = $this->upload->data();
+			$namaFile = $upload_data['file_name'];
+			$fullPath = $upload_data['full_path'];
+			$inputDataMaster["path_permohonanBarang"] = $fullPath;
+
+			$pros = $this->M_dinamis->update('t_master_permohonan_barang', ['path_bast' => $fullPath], ['id' => $id]);
+
+			if ($pros) {
+				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+					<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>');
+			}else{
+				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>');
+			}
+
+			redirect('/PermohonanBarang', 'refresh');
+
+		}
+
+	}
+
+
 }

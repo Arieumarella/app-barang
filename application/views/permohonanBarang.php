@@ -46,18 +46,22 @@
           <div class="row">
             <div class="mb-3 col-12">
               <div class="form-label">Surat Permohonan Barang</div>
-              <input type="file" class="form-control" name="permohonanBarang" required>
+              <input type="file" class="form-control" name="permohonanBarang" accept=".pdf" required>
             </div>
             <hr class="mt-3" >
             <div id="contentFormPermohonan">
               <div class="mb-3 col-12" style="margin-top: -20px;">
                 <label class="form-label">Jenis Barang</label>
-                <select class="form-select" name="jns_barang[]" id="jns_barang" required>
+                <select class="form-select" name="jns_barang[]" id="jns_barang" data-index="1" required>
                   <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
                   <?php foreach ($dataJnsBarang as $key => $value) { ?>
                     <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
                   <?php } ?>
                 </select>
+              </div>
+              <div class="mb-3 col-12">
+                <label class="form-label">Jumlah Stock Barang Yang Ada</label>
+                <input type="text" class="form-control" id="stock_barang_1" placeholder="Pilih Jenis Barang Terlebih Dahulu" disabled>
               </div>
               <div class="mb-3 col-12">
                 <label class="form-label">Jumlah Barang</label>
@@ -94,7 +98,7 @@
           <input type="hidden" name="idEditX" id="idEditX">
           <div class="mb-3">
             <label class="form-label">Ubah Status</label>
-            <select class="form-select" name="dataStatus" id="dataStatus" required>
+            <select class="form-select" name="dataStatus" id="dataStatus"  required>
               <option value="" selected disabled>--- Pilih Satuan ---</option>
               <?php foreach ($dataStatus as $key => $value) { ?>
                 <option value="<?= $value->id; ?>"><?= $value->nama_status; ?></option>
@@ -122,18 +126,71 @@
 </div>
 <!-- End Modal Tambah -->
 
+<!-- Modal BAST -->
+<div class="modal modal-blur fade" id="modalAksiBast">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Form Upload Dokumen BAST</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="<?= base_url(); ?>PermohonanBarang/uploadBast" method="POST"  enctype="multipart/form-data">
+          <input type="hidden" name="idBarangBAST" id="idBarangBAST">
+          <div class="mb-3 col-12">
+            <div class="form-label">Dokumen BAST</div>
+            <input type="file" class="form-control" name="bast" accept=".pdf" required>
+          </div>
+          <div class="modal-footer">
+            <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" >Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal BAST -->
+
+
 <script>
   $(document).ready(function() {
 
 
-    let prive = '<?= $this->session->userdata('roll'); ?>';
+    let prive = '<?= $this->session->userdata('roll'); ?>',
+    indexSelecForm = 1;
+
+
+    $("select[name='jns_barang[]']").change(function() {
+      let selectedIndex = $(this).data("index"),
+      selectedValue = $(this).val();
+
+
+      ajaxUntukSemua(base_url()+'PermohonanBarang/getSockBarangById', {id:selectedValue}, function(data) {
+
+       $('#stock_barang_1').val(data.jml_stock);
+
+     }, 
+     function(error) {
+      console.log('Kesalahan:', error);
+      t_error('Sistem Error, Pesan : '+error)
+    });
+      
+      console.log("Select ke-" + selectedIndex + " terpilih: " + selectedValue);
+
+
+
+    });
 
 
     tambahRow = function () {
+      indexSelecForm++;
 
-      let html = ` <div class="mb-3 col-12">
+      let html = `<div class="mb-3 col-12">
       <label class="form-label">Jenis Barang</label>
-      <select class="form-select" name="jns_barang[]" required>
+      <select class="form-select" name="jns_barang[]" data-index="${indexSelecForm}" required>
       <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
       <?php foreach ($dataJnsBarang as $key => $value) { ?>
         <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
@@ -141,16 +198,39 @@
       </select>
       </div>
       <div class="mb-3 col-12">
+      <label class="form-label">Jumlah Stock Barang Yang Ada</label>
+      <input type="text" class="form-control" id="stock_barang_${indexSelecForm}" placeholder="Pilih Jenis Barang Terlebih Dahulu" disabled>
+      </div>
+      <div class="mb-3 col-12">
       <label class="form-label">Jumlah Barang</label>
       <input type="text" class="form-control" name="jml_barang[]" placeholder="Input Jumlah Barang" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
-      </div> 
       </div>`;
 
       $("#contentFormPermohonan").append(html);
+
+
+      $("select[name='jns_barang[]']").change(function() {
+        let selectedIndex = $(this).data("index"),
+        selectedValue = $(this).val();
+
+        ajaxUntukSemua(base_url()+'PermohonanBarang/getSockBarangById', {id:selectedValue}, function(data) {
+
+         $('#stock_barang_'+selectedIndex).val(data.jml_stock);
+
+       }, 
+       function(error) {
+        console.log('Kesalahan:', error);
+        t_error('Sistem Error, Pesan : '+error)
+      });
+
+
+
+      });
     }
 
     showModalUploadBast = function (id) {
-      alert(id);
+      $('#idBarangBAST').val(id);
+      $('#modalAksiBast').modal('show');
     }
 
 
@@ -315,11 +395,12 @@
         "class" : "text-center",
         "orderable": false,
         "render": function (data, type, row) {
-          let actions = '';
+          let actions = '',
+          status  = row.status_review;
           if (prive == '5') {
             actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
           }else if (prive == '4'){
-            actions = `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`;
+            actions = (status!='0') ? `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`:'';
           }
           return actions;
         },
