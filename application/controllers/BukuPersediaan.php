@@ -73,11 +73,14 @@ class BukuPersediaan extends CI_Controller {
 		foreach ($dataAwal as $key => $val) {
 			
 			$tmp = array(
-				'datatable' => $this->M_exportData->BarangPerSediaan($bulan),
+				'datatable' => $this->M_exportData->getDataTabel($val->id, $bulan),
+				'dataTabelAwal' => $this->M_exportData->getDataAwal($val->id, $bulan),
+				'dataBarang' => $this->M_exportData->getDataBarang($val->id),
 				'tahun' => $tahun,
 				'hari' => date('d'),
 				'Bulan' => $arrayBulan[$bulan],
 				'maksHari' => $jumlah_hari,
+				'awalTanggal' => '01',
 				'bulanAngka' => $bulan,
 				'jamMenit' => date('H:i A')
 			);

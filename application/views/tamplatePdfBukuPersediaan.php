@@ -147,7 +147,7 @@ border-collapse: collapse;
     <div class="tulisanBiasa">SATKER KONSOLIDASI KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</div>
     <br>
     <h1 class="center">buku persediaan</h1>
-    <h1 class="center2"> PERIODE 01-08-2023 S/D 31-08-2023</h1>
+    <h1 class="center2"> PERIODE 01-<?= $bulanAngka; ?>-<?= $tahun; ?> S/D <?= $maksHari; ?>-<?= $bulanAngka; ?>-<?= $tahun; ?></h1>
 
     <div class="container">
 
@@ -193,15 +193,15 @@ border-collapse: collapse;
         <table class="smallTable3 tableContentKecil2">
             <tr>
                 <td>KODE BARANG</td>
-                <td>: 1.01.03.01.001.000003</td>
+                <td>: <?= $dataBarang->id_barang_custom; ?></td>
             </tr>
             <tr>
                 <td>NAMA BARANG</td>
-                <td>: Spidol Snowan White Board</td>
+                <td>: <?= ucwords($dataBarang->nama_barang); ?></td>
             </tr>
             <tr>
                 <td>SATUAN</td>
-                <td>: Lusin</td>
+                <td>: <?= ucwords($dataBarang->nama_satuan); ?></td>
             </tr>
         </table>
         <!-- End Tabel kecil 3 -->
@@ -212,8 +212,8 @@ border-collapse: collapse;
         <thead>
             <tr style="font-size: 10px; font-weight: normal;">
                 <th rowspan="2" style="width:2%;">No</th>
-                <th rowspan="2" style="width:5%;">Tanggal</th>
-                <th rowspan="2" style="width:10%;">Keterangan</th>
+                <th rowspan="2" style="width:8%;">Tanggal</th>
+                <th rowspan="2" style="width:15%;">Keterangan</th>
                 <th colspan="3" style="width: 15%;">Masuk</th>
                 <th colspan="3" style="width: 15%;">Keluar</th>
                 <th colspan="3" style="width: 15%;">Saldo Persediaan</th>
@@ -230,30 +230,70 @@ border-collapse: collapse;
                 <th>Jumlah</th>
             </tr>
         </thead>
-        <tbody style="font-size:11px;">
+        <tbody style="font-size:11px; text-align: right;">
             <tr>
-                <td>Data 1</td>
-                <td>Data 2</td>
-                <td>Data 3</td>
-                <td>Data 4</td>
-                <td>Data 5</td>
-                <td>Data 6</td>
-                <td>Data 7</td>
-                <td>Data 8</td>
-                <td>Data 9</td>
-                <td>Data 10</td>
-                <td>Data 11</td>
-                <td>Data 12</td>
+                <td style="text-align:center;">1.</td>
+                <td style="text-align:center;"></td>
+                <td style="text-align:left;">Saldo Awal <?= $awalTanggal; ?>-<?= $Bulan; ?>-<?= $tahun; ?></td>
+                <td>0</td>
+                <td></td>
+                <td>0</td>
+                <td>0</td>
+                <td></td>
+                <td>0</td>
+                <td><?= $dataTabelAwal->jml_stok_barang; ?></td>
+                <td></td>
+                <td><?= number_format($dataTabelAwal->total_saldo_awal,0,',','.'); ?></td>
             </tr>
+
+            <?php 
+            $unit_persediaan= $dataTabelAwal->jml_stok_barang;
+            $total_saldo_akhir= $dataTabelAwal->total_saldo_awal;
+            $totBarangMasuk=0;
+            $totBarangKeluar=0;
+            ?>
+
+            <?php $no=2; foreach ($datatable as $key => $val) { ?>
+                <?php 
+
+                if ($val->jns_barang == 'Barang Masuk') {
+                    $unit_persediaan += $val->jml_barang_masuk;
+                    $total_saldo_akhir += $val->total_harga_barang;
+                }else{
+                    $unit_persediaan -= $val->jml_barang_keluar;
+                    $total_saldo_akhir -= $val->total_harga_barang_keluar;  
+                }
+
+                $totBarangMasuk+= (float)$val->jml_barang_masuk;
+                $totBarangKeluar += (float)$val->jml_barang_keluar;
+
+                ?>
+
+                <tr>
+                    <td style="text-align:center;"><?= $no; ?>.</td>
+                    <td style="text-align:center;"><?= $val->tanggal; ?></td>
+                    <td style="text-align:left;"><?= $val->jns_barang ?> <?= $val->tanggal; ?></td>
+                    <td><?= $val->jml_barang_masuk; ?></td>
+                    <td><?= number_format(($val->harga_satuan_barang_masuk == null) ? 0:$val->harga_satuan_barang_masuk,0,',','.'); ?></td>
+                    <td><?= number_format(($val->total_harga_barang== null) ? 0 :$val->total_harga_barang,0,',','.'); ?></td>
+                    <td><?= $val->jml_barang_keluar; ?></td>
+                    <td><?= number_format(($val->harga_satuan_barang_keluar == null ) ? 0:$val->harga_satuan_barang_keluar,0,',','.'); ?></td>
+                    <td><?= number_format(($val->total_harga_barang_keluar == null) ? 0:$val->total_harga_barang_keluar,0,',','.'); ?></td>
+
+                    <td><?= $unit_persediaan; ?></td>
+                    <td></td>
+                    <td><?= number_format(($total_saldo_akhir == null ) ? 0: $total_saldo_akhir,0,',','.'); ?></td>
+                </tr>
+            <?php } ?>
         </tbody>
         <tfoot style="font-size:11px;">
             <tr>
                 <td colspan="3" style="text-align: right;">Jumlah</td>
-                <td colspan="3" style="text-align: center;">0</td>
-                <td colspan="3" style="text-align: center;">0</td>
+                <td colspan="3" style="text-align: center;"><?= $totBarangMasuk; ?></td>
+                <td colspan="3" style="text-align: center;"><?= $totBarangKeluar;  ?></td>
+                <td style="text-align: right;"><?= $unit_persediaan;  ?></td>
                 <td style="text-align: right;">0</td>
-                <td style="text-align: right;">0</td>
-                <td style="text-align: right;">0</td>
+                <td style="text-align: right;"><?= number_format(($total_saldo_akhir == null ) ? 0: $total_saldo_akhir,0,',','.'); ?></td>
             </tr>
         </tfoot>
     </table>
