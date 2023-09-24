@@ -46,7 +46,7 @@ class M_barang extends CI_Model {
 	{
 		$qry = "SELECT a.*, b.nama_barang AS jns_barang FROM 
 		(
-			SELECT id_kategori_barang, id_kondisi_barang, nama_barang, harga_satuan, COUNT(*) AS jml_barang FROM t_stok_barang WHERE id_faktur='$id' GROUP BY id_kategori_barang
+			SELECT id_faktur, id_kategori_barang, id_kondisi_barang, nama_barang, harga_satuan, COUNT(*) AS jml_barang FROM t_stok_barang WHERE id_faktur='$id' GROUP BY id_kategori_barang
 			) AS a
 		LEFT JOIN
 		(
@@ -91,6 +91,50 @@ class M_barang extends CI_Model {
 		}
 
 		return $this->db->count_all_results();
+	}
+
+	public function getDataStockByKd($id_faktur, $id_barang)
+	{
+		$qry = "SELECT COUNT(*) AS jml_stok, harga_satuan, id_kategori_barang, nama_barang FROM t_stok_barang WHERE id_faktur='$id_faktur' AND id_kategori_barang='$id_barang'";
+
+		return $this->db->query($qry)->row();
+	}
+
+
+	public function saveEditData($id_faktur, $id_barang, $jns_barang, $nama_barang, $jml_barang, $harga_satuan)
+	{
+		$this->db->trans_begin();
+
+		$dataAwal = $this->db->get_where('t_stok_barang', ['id_faktur' => $id_faktur, 'id_kategori_barang' => $id_barang])->row();
+
+
+		$this->db->delete('t_stok_barang', ['id_faktur' => $id_faktur, 'id_kategori_barang' => $id_barang]);
+
+		$jumlah_iterasi = (int)$jml_barang;
+
+		for ($i = 0; $i < $jumlah_iterasi; $i++) {
+
+			$dataInsert = array(
+				'id_kategori_barang' => $jns_barang, 
+				'id_kondisi_barang' => '1',
+				'id_faktur' => $id_faktur,
+				'nama_barang' =>  $nama_barang,
+				'harga_satuan' => $harga_satuan,
+				'tgl_faktur' => $dataAwal->tgl_faktur,
+				'created_at' => date('Y-m-d H:i:s')
+			);
+			$this->db->insert('t_stok_barang', $dataInsert);
+
+		}
+
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return FALSE;
+		} else {
+			$this->db->trans_commit();
+			return true;
+		}
 	}
 
 }

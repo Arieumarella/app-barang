@@ -85,47 +85,6 @@
 </div>
 <!-- End Modal Tambah -->
 
-<!-- Modal Tambah -->
-<div class="modal modal-blur fade" id="modalAksi">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Form Approval Pengajuan Barang</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form action="<?= base_url(); ?>PermohonanBarang/simpanApproval" method="POST">
-          <input type="hidden" name="idEditX" id="idEditX">
-          <div class="mb-3">
-            <label class="form-label">Ubah Status</label>
-            <select class="form-select" name="dataStatus" id="dataStatus"  required>
-              <option value="" selected disabled>--- Pilih Satuan ---</option>
-              <?php foreach ($dataStatus as $key => $value) { ?>
-                <option value="<?= $value->id; ?>"><?= $value->nama_status; ?></option>
-              <?php } ?>
-            </select>
-          </div>
-          <div class="mb-3 col-12">
-            <label class="form-label">Jumlah Barang</label>
-            <input type="number" class="form-control" name="jml_barangApprove" id="jml_barangApprove" placeholder="Input Jumlah Barang" oninput="setTotHarga(); this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required max="5">
-          </div>
-          <div class="mb-3 col-12">
-            <label class="form-label">Keterangan</label>
-            <textarea class="form-control" data-bs-toggle="autosize" name="catatan" placeholder="Input Catatan" style="height: 150px;" required></textarea>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
-              Cancel
-            </a>
-            <button type="submit" class="btn btn-primary" >Simpan</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- End Modal Tambah -->
-
 <!-- Modal BAST -->
 <div class="modal modal-blur fade" id="modalAksiBast">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -155,12 +114,53 @@
 <!-- End Modal BAST -->
 
 
+<!-- Modal edit -->
+<div class="modal modal-blur fade" id="modalEditData" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Permohonan Barang</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="<?= base_url(); ?>PermohonanBarang/simpanEditPermintaan" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="idEditData" id="idEditData">
+          <div class="row">
+            <div class="mb-3 col-12">
+              <div class="form-label">Surat Permohonan Barang</div>
+              <input type="file" class="form-control" name="permohonanBarang" accept=".pdf" required>
+            </div>
+            <p style="color: red;">*Untuk edit barang silakan masuk pada detail barang.</p>
+            <div class="modal-footer">
+              <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">Simpan</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Modal edit -->
+
+
 <script>
   $(document).ready(function() {
 
 
     let prive = '<?= $this->session->userdata('roll'); ?>',
     indexSelecForm = 1;
+
+
+    editdata = function (id, nm_status){
+
+      $('#idEditData').val(id);
+
+      $('#modalEditData').modal('show');
+
+    }
 
 
     $("select[name='jns_barang[]']").change(function() {
@@ -277,16 +277,6 @@
 
     deleteFunction = function (id, sts) {
 
-      if (sts != 'Panding') {
-        Swal.fire({
-          icon: 'error',
-          title: 'Gagal Menghapus Data',
-          text: `Data Gagal dihapus dikarenakan status Approval adalah ${sts}`,
-          confirmButtonText: 'Tutup'
-        });
-        return;
-      }
-
       Swal.fire({
         title: 'Konfirmasi Hapus Data',
         text: 'Apakah Anda yakin ingin menghapus data ini?',
@@ -343,7 +333,7 @@
         "width" : "15%",
         "class" : "text-center",
         "render": function (data, type, row, meta) {
-          return `<a href="<?= base_url(); ?>/PermohonanBarang/detailPermohonan/${row.id}">${row.username_pemohon}</a>`;
+          return `<a href="<?= base_url(); ?>PermohonanBarang/detailPermohonan/${row.id}">${row.username_pemohon}</a>`;
         }
       },
       {
@@ -396,9 +386,11 @@
         "orderable": false,
         "render": function (data, type, row) {
           let actions = '',
-          status  = row.status_review;
+          status  = row.status_review,
+          disabled = (status == '1') ? 'disabled' : '';
+          
           if (prive == '5') {
-            actions = '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.nama_status+'`)"><i class="fa-solid fa-trash"></i></button>';
+            actions = '<button class="btn btn-icon btn-sm btn-warning m-1" onclick="editdata(' + row.id + ', `'+row.status_review+'`)" '+disabled+' ><i class="fa-solid fa-file-pen"></i></button><button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ', `'+row.status_review+'`)" '+disabled+' ><i class="fa-solid fa-trash"></i></button>';
           }else if (prive == '4'){
             actions = (status!='0') ? `<button class="btn btn-icon btn-primary m-1" onclick="showModalUploadBast(${row.id})"><i class="fa-solid fa-upload"></i></button>`:'';
           }

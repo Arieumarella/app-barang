@@ -254,7 +254,8 @@ class PermohonanBarang extends CI_Controller {
 			'content' => 'detailPermohonanBarang',
 			'dataRekap' => $this->M_permohonanBarang->getDetailbarang($id),
 			'idMaster' => $id,
-			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id])
+			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]),
+			'listBarang' => $this->M_dinamis->add_all('t_barang', '*', 'id', 'asc')
 		);
 
 		$this->load->view('tamplate/baseTamplate', $tmp);
@@ -366,6 +367,113 @@ class PermohonanBarang extends CI_Controller {
 			redirect('/PermohonanBarang', 'refresh');
 
 		}
+
+	}
+
+
+	public function simpanEditPermintaan()
+	{
+		$id = $this->input->post('idEditData');
+
+		$username = $this->session->userdata('username');
+		$nmFileGagalUpload = '';
+
+
+		if (!file_exists('./assets/upload Dokumen Permintaan Barang')) {
+			mkdir('./assets/upload Dokumen Permintaan Barang');
+		}
+
+
+		if (!file_exists("./assets/upload Dokumen Permintaan Barang/$username")) {
+			mkdir("./assets/upload Dokumen Permintaan Barang/$username");
+		}
+
+
+		$path = "./assets/upload Dokumen Permintaan Barang/$username/";
+
+		$pathX = $_FILES['permohonanBarang']['name'];
+		$ext = pathinfo($pathX, PATHINFO_EXTENSION);
+
+
+		$config['upload_path'] = $path;
+		$config['allowed_types'] = 'pdf';
+		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
+		$config['max_size'] = 100000;
+
+		$this->load->library('upload', $config);
+
+		if (!$this->upload->do_upload('permohonanBarang')){
+
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan dengan alasan '.$this->upload->display_errors().'
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+
+			redirect('/PermohonanBarang', 'refresh');
+
+		}else{
+
+			$upload_data = $this->upload->data();
+			$namaFile = $upload_data['file_name'];
+			$fullPath = $upload_data['full_path'];
+
+			$pros = $this->M_dinamis->update('t_master_permohonan_barang', ['path_permohonanBarang' => $fullPath], ['id' => $id]);
+
+			if ($pros) {
+				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+					<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>');
+			}else{
+				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+					<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>');
+			}
+
+			redirect('/PermohonanBarang', 'refresh');
+
+		}
+	}
+
+
+	public function deleteDataDetail()
+	{
+		$id = $this->input->post('id');
+
+		$pros = $this->M_dinamis->delete('t_detail_permohonan_barang', ['id' => $id]);
+
+		echo json_encode(['code' => ($pros) ? 200 : 401, 'msg' => ($pros) ? '' : 'gagal melakukan hapus data.!']);
+	}
+
+
+	public function simpanPermintaanEdit()
+	{	
+		$idDetail = $this->input->post('idDetail');
+		$idEdit = $this->input->post('idEdit');
+		$jns_barang = $this->input->post('jns_barang');
+		$jml_barang = $this->input->post('jml_barang');
+
+		$dataEdit = array(
+			'id_jns_barang' => $jns_barang,
+			'jml_barang' => $jml_barang
+		);
+
+		$pros = $this->M_dinamis->update('t_detail_permohonan_barang', $dataEdit, ['id' => $idEdit]);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect('/PermohonanBarang/detailPermohonan/'.$idDetail, 'refresh');
 
 	}
 

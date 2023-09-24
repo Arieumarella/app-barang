@@ -121,50 +121,90 @@
 </div>
 <!-- End Modal Tambah -->
 
-<!-- Modal Tambah -->
-<div class="modal modal-blur fade" id="modalEdit">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+
+<!-- Modal edit -->
+<div class="modal modal-blur fade" id="modalEdit" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Data Jenis Barang</h5>
+        <h5 class="modal-title">Edit Data</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="<?= base_url(); ?>KategoriBarang/simpanEditSatuan" method="POST">
-          <div class="mb-3">
-            <label class="form-label">Nama Jenis Barang</label>
-            <input type="text" class="form-control" name="namaKategoriBarangEdit" id="namaKategoriBarangEdit" placeholder="Input Nama Kategori Batrang" required>
-            <input type="hidden" name="idEdit" id="idEdit">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Satuan Barang</label>
-            <select class="form-select" name="satuanEdit" id="satuanEdit" required>
-              <option value="" selected disabled>--- Pilih Satuan ---</option>
-              <?php foreach ($datakondisi as $key => $value) { ?>
-                <option value="<?= $value->id; ?>"></option>
-              <?php } ?>
-            </select>
-          </div>
-          <div class="modal-footer">
-            <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
-              Cancel
-            </a>
-            <button type="submit" class="btn btn-primary">Simpan</button>
-          </div>
-        </form>
+        <form action="<?= base_url(); ?>StockBarang/simpanEditFaktur" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="idEdit" id="idEdit">
+          <div class="row">
+            <div class="mb-3 col-6">
+              <label class="form-label">Nomor Faktur</label>
+              <input type="text" class="form-control" name="noFakturEdit" id="noFakturEdit" placeholder="Input Nomor Faktur" required>
+            </div>
+            <div class="mb-3 col-6">
+              <label class="form-label">Tanggal Faktur</label>
+              <input type="text" class="form-control" name="tglFakturEdit"  id="tglFakturEdit" placeholder="Tanggal Faktur" required>
+              <span class="input-icon-addon mb-5" style="margin-right: 10px;">
+              </div>
+              <div class="col-12">
+                <div class="mb-3 col-12">
+                  <div class="form-label">Dokumen Faktur</div>
+                  <input type="file" class="form-control" name="fakturEdit" accept=".pdf" required>
+                </div>
+                <div class="mb-3 col-12">
+                  <div class="form-label">Dokumen SPM</div>
+                  <input type="file" class="form-control" name="SPMEdit" accept=".pdf" required>
+                </div>
+              </div>
+              <p style="color: red;">*Untuk edit barang silakan masuk pada detail barang.</p>
+              <div class="modal-footer">
+                <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
+                  Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div> 
-<!-- End Modal Tambah -->
-
-<script>
-  $(document).ready(function() {
-
-    let prive = '<?= $this->session->userdata('roll'); ?>';
+  <!-- End Modal edit -->
 
 
-    addNuwRow = function () {
+  <script>
+    $(document).ready(function() {
+
+      let prive = '<?= $this->session->userdata('roll'); ?>';
+
+      editData = function (id) {
+
+       ajaxUntukSemua(base_url()+'StockBarang/getDataById', {id}, function(data) {
+
+        console.log(data)
+
+        let inputDate = data.tgl_faktur;
+        parts = inputDate.split('-'), 
+        year = parts[0],
+        month = parts[1],
+        day = parts[2],
+        formattedDate = month + '/' + day + '/' + year;
+
+        $('#idEdit').val(id);
+        $('#noFakturEdit').val(data.no_faktur);
+        $('#tglFakturEdit').val(formattedDate);
+        tglFakturEdit.setDate(formattedDate);
+        $('#modalEdit').modal('show');
+
+
+      }, 
+      function(error) {
+        console.log('Kesalahan:', error);
+        t_error('Sistem Error, Pesan : '+error)
+      });
+
+
+     }
+
+
+     addNuwRow = function () {
       let html = `<div class="row">
       <div class="mb-3 col-6">
       <label class="form-label">Jenis Barang</label>
@@ -340,7 +380,7 @@
         "orderable": false,
         "render": function (data, type, row) {
           let actions = '';
-          actions = (prive == '4') ? '<button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ')"><i class="fa-solid fa-trash"></i></button>' : '';
+          actions = (prive == '4') ? '<button class="btn btn-icon btn-sm btn-warning m-1" onclick="editData(' + row.id + ')"><i class="fa-solid fa-pen-to-square"></i></button><button class="btn btn-icon btn-sm btn-danger m-1" onclick="deleteFunction(' + row.id + ')"><i class="fa-solid fa-trash"></i></button>' : '';
           return actions;
         },
         "orderable": false,
@@ -357,6 +397,17 @@
 
     let dataTanggal = new Litepicker({
       element: document.getElementById('tanggalX'),
+      buttonText: {
+        previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>`,
+        nextMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-right -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="9 6 15 12 9 18" /></svg>`,
+      },
+      format: "MM/DD/YYYY"
+    }),
+
+    tglFakturEdit = new Litepicker({
+      element: document.getElementById('tglFakturEdit'),
       buttonText: {
         previousMonth: `<!-- Download SVG icon from http://tabler-icons.io/i/chevron-left -->
         <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><polyline points="15 6 9 12 15 18" /></svg>`,

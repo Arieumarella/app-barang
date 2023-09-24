@@ -144,7 +144,7 @@ border-collapse: collapse;
 <body>
     <div class="tulisanBiasa">KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</div>
     <div class="tulisanBiasa">DIREKTORAT JENDRAL CIPTA KARYA</div>
-    <div class="tulisanBiasa">SATKER KONSOLIDASI KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</div>
+    <div class="tulisanBiasa">SATKER BALAI PRASARANA PERMUKIMAN WILAYAH DI YOGYAKARTA</div>
     <br>
     <h1 class="center">buku persediaan</h1>
     <h1 class="center2"> PERIODE 01-<?= $bulanAngka; ?>-<?= $tahun; ?> S/D <?= $maksHari; ?>-<?= $bulanAngka; ?>-<?= $tahun; ?></h1>

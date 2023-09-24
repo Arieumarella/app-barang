@@ -21,6 +21,7 @@
                   <th>Status <br> Approval</th>
                   <th>Jumlah Baraang <br> Approve</th>
                   <th>Catatan <br> Kasubagg TU</th>
+                  <th style="width:5%;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -40,6 +41,16 @@
                     </td>
                     <td class="text-end" style="width: 10%;"><?= $val->jml_barang_approve; ?></td>
                     <td class="text-end" style="width: 15%;"><?= $val->catatan; ?></td>
+                    <td class="text-center">
+                      <?php 
+
+                      $disabled = ($val->sts_approval != '0') ? 'disabled':'';
+
+                      ?>
+                      <button class="btn btn-warning btn-icon" onclick="editData('<?= $val->id; ?>', '<?= $val->id_jns_barang; ?>', '<?= $val->jml_barang; ?>');" <?= $disabled; ?>><i class="fa-solid fa-file-pen"></i></button>
+                      <button class="btn btn-danger btn-icon" onclick="deleteData('<?= $val->id; ?>', '<?= $val->id_jns_barang; ?>');" <?= $disabled; ?>><i class="fa-solid fa-trash"></i></button>
+
+                    </td>
                   </tr>
                   <?php $no++; } ?>
                 </tbody>
@@ -103,12 +114,130 @@
       </div>
     </div>
 
-
+    <!-- Modal edit -->
+    <div class="modal modal-blur fade" id="modalEdit" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Permohonan Barang</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="<?= base_url(); ?>PermohonanBarang/simpanPermintaanEdit" method="POST">
+              <input type="hidden" name="idEdit" id="idEdit">
+              <input type="hidden" name="idDetail" value="<?= $idMaster; ?>">
+              <div class="row">
+                <div id="contentFormPermohonan">
+                  <div class="mb-3 col-12" style="margin-top: -20px;">
+                    <label class="form-label">Jenis Barang</label>
+                    <select class="form-select" name="jns_barang" id="jns_barang" data-index="1" required>
+                      <option value="" selected disabled>--- Pilih Jenis Barang ---</option>
+                      <?php foreach ($listBarang as $key => $value) { ?>
+                        <option value="<?= $value->id; ?>"><?= $value->nama_barang; ?></option>
+                      <?php } ?>
+                    </select>
+                  </div>
+                  <div class="mb-3 col-12">
+                    <label class="form-label">Jumlah Stock Barang Yang Ada</label>
+                    <input type="text" class="form-control" id="stock_barang" placeholder="Pilih Jenis Barang Terlebih Dahulu" disabled>
+                  </div>
+                  <div class="mb-3 col-12">
+                    <label class="form-label">Jumlah Barang</label>
+                    <input type="text" class="form-control" name="jml_barang" id="jml_barang" placeholder="Input Jumlah Barang" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
+                    Cancel
+                  </a>
+                  <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Modal edit -->
 
     <script>
       $(document).ready(function() {
 
         let prive = '<?= $this->session->userdata('roll'); ?>';
+
+
+        editData = function (id, id_jns_barang, jml_barang) {    
+          $('#idEdit').val(id);
+          $('#jns_barang').val(id_jns_barang);
+          $('#jml_barang').val(jml_barang);
+
+          ajaxUntukSemua(base_url()+'PermohonanBarang/getSockBarangById', {id:id_jns_barang}, function(data) {
+
+           $('#stock_barang').val(data.jml_stock);
+
+         }, 
+         function(error) {
+          console.log('Kesalahan:', error);
+          t_error('Sistem Error, Pesan : '+error)
+        });
+
+
+          $('#modalEdit').modal('show');
+        }
+
+
+        $("#jns_barang").change(function() {
+          let val = $(this).val();
+          
+          ajaxUntukSemua(base_url()+'PermohonanBarang/getSockBarangById', {id:val}, function(data) {
+
+           $('#stock_barang').val(data.jml_stock);
+
+         }, 
+         function(error) {
+          console.log('Kesalahan:', error);
+          t_error('Sistem Error, Pesan : '+error)
+        });
+
+
+
+        });
+
+
+        deleteData = function (id, id_jns_barang) {
+
+          Swal.fire({
+            title: 'Konfirmasi Hapus Data',
+            text: 'Apakah Anda yakin ingin menghapus data ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              ajaxUntukSemua(base_url()+'PermohonanBarang/deleteDataDetail', {id}, function(data) {
+
+                if (data.code != 200) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Menghapus Data',
+                    text: data.msg,
+                    confirmButtonText: 'Tutup'
+                  });
+                  return;
+                }
+
+                location.reload();
+              }, 
+              function(error) {
+                console.log('Kesalahan:', error);
+                t_error('Sistem Error, Pesan : '+error)
+              });
+            }
+          });
+
+
+        }
 
 
         $('#formSubmit').submit(async function (event) {

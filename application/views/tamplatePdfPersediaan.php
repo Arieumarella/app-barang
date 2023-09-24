@@ -171,7 +171,7 @@
                 <td>KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</td>
             </tr>
             <tr>
-                <td>DIREKTORAT JENDRAL CIPTA KARYA</td>
+                <td>BALAI PRASARANA PERMUKIMAN WILAYAH DI YOGYAKARTA</td>
             </tr>
         </table>
         <!-- End Tabel kecil 2 -->

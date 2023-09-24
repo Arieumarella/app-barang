@@ -65,8 +65,10 @@ class StockBarang extends CI_Controller {
 			'footer_content' => 'footer',
 			'sidebar' => 'sidebar-left',
 			'content' => 'detailBarang',
+			'idContent' => $id,
 			'datakondisi' => $this->M_barang->getDataDetail($id),
-			'dataFaktur' => $this->M_dinamis->getById('t_faktur', ['id' => $id])
+			'dataFaktur' => $this->M_dinamis->getById('t_faktur', ['id' => $id]),
+			'listBarang' => $this->M_dinamis->add_all('t_barang', '*', 'id', 'asc')
 		);
 
 		$this->load->view('tamplate/baseTamplate', $tmp);
@@ -238,6 +240,185 @@ class StockBarang extends CI_Controller {
 		);
 
 		echo json_encode($output);
+	}
+
+
+	public function getDataById()
+	{
+		$id = $this->input->post('id');
+
+		$data = $this->M_dinamis->getById('t_faktur', ['id' => $id]);
+
+		echo json_encode($data);
+	}
+
+
+	public function simpanEditFaktur()
+	{	
+
+
+		$idEdit = $this->input->post('idEdit');
+		$noFakturEdit = $this->input->post('noFakturEdit');
+		$tglFakturEdit = $this->input->post('tglFakturEdit');
+		$arrayDate = explode('/',$tglFakturEdit);
+		$tanggalFakturFormat = $arrayDate[2].'-'.$arrayDate[0].'-'.$arrayDate[1];
+		$username = $this->session->userdata('username');
+		$nmFileGagalUpload='';
+
+		$dataEditFaktur = array(
+			'no_faktur' => $noFakturEdit,
+			'tgl_faktur' => $tanggalFakturFormat
+		);
+
+
+		$arrayFile = array(
+			'fakturEdit' => 'Dokumen Faktru',
+			'SPMEdit' => 'Dokumen SPM',
+		);
+
+		$arrayTypKolom = array(
+			'fakturEdit' => 'dok_faktur',
+			'SPMEdit' => 'dok_spm',
+		);
+
+		$config['allowed_types'] = 'pdf';
+		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.pdf';
+		$config['max_size'] = 100000;
+		$this->load->library('upload', $config);
+
+
+		foreach ($arrayFile as $key => $value) {
+
+			if (!empty($_FILES[$key]['name'])) {
+
+				if (!file_exists('./assets/upload Dokumen Input Barang')) {
+					mkdir('./assets/upload Dokumen Input Barang');
+				}
+
+
+				if (!file_exists("./assets/upload Dokumen Input Barang/$username")) {
+					mkdir("./assets/upload Dokumen Input Barang/$username");
+				}
+
+				if (!file_exists("./assets/upload Dokumen Input Barang/$username/$value")) {
+					mkdir("./assets/upload Dokumen Input Barang/$username/$value");
+				}
+
+
+				$path = "./assets/upload Dokumen Input Barang/$username/$value";
+
+				$pathX = $_FILES[$key]['name'];
+				$ext = pathinfo($pathX, PATHINFO_EXTENSION);
+
+
+				$config['upload_path'] = $path;
+				$config['allowed_types'] = 'pdf';
+				$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
+				$config['max_size'] = 100000;
+
+				$this->upload->initialize($config);
+
+				if (!$this->upload->do_upload($key)){
+
+					$nmFileGagalUpload .= '   File'.$value.',';
+					
+				}else{
+
+					$upload_data = $this->upload->data();
+					$namaFile = $upload_data['file_name'];
+					$fullPath = $upload_data['full_path'];
+
+					$dataEditFaktur["$arrayTypKolom[$key]"] = $fullPath;
+					
+				}
+			}
+		}
+
+
+		$pros = $this->M_dinamis->update('t_faktur', $dataEditFaktur, ['id' => $idEdit]);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect('/StockBarang', 'refresh');
+
+	}
+
+
+	public function getBarangDigunakan()
+	{
+		$id_faktur = $this->input->post('id_faktur');
+		$id_barang = $this->input->post('id_barang');
+
+		$data = $this->M_dinamis->getById('t_stok_barang', ['id_faktur' => $id_faktur, 'id_kategori_barang' => $id_barang, 'terpakai' => '1']);
+
+		if ($data != null) {
+			echo json_encode(['code' => 401]);
+		}else{
+			echo json_encode(['code' => 200]);
+		}
+
+	}
+
+
+	public function deleteDetailBarang()
+	{
+		$id_faktur = $this->input->post('id_faktur');
+		$id_barang = $this->input->post('id_barang');
+
+		$pros = $this->M_dinamis->delete('t_stok_barang', ['id_faktur' => $id_faktur, 'id_kategori_barang' => $id_barang]);
+
+		echo json_encode(['code' => ($pros) ? 200:401, 'msg' => 'Data Gagal dihapus.!']);
+
+	}
+
+
+	public function getStockBarangByFakturIdBarang()
+	{
+		$id_faktur = $this->input->post('id_faktur');
+		$id_barang = $this->input->post('id_barang');
+
+		$data = $this->M_barang->getDataStockByKd($id_faktur, $id_barang);
+
+		echo json_encode($data);
+
+	}
+
+
+	public function simpanEditData()
+	{
+		$id_faktur = $this->input->post('idFaktur');
+		$id_barang = $this->input->post('idBarang');
+		$jns_barang = $this->input->post('jns_barang');
+		$nama_barang = $this->input->post('nama_barang');
+		$jml_barang = $this->input->post('jml_barang');
+		$harga_satuan = $this->input->post('harga_satuan');
+		$idContent = $this->input->post('idContent');
+
+		$pros = $this->M_barang->saveEditData($id_faktur, $id_barang, $jns_barang, $nama_barang, $jml_barang, $harga_satuan);
+
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}else{
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
+		}
+
+		redirect('/StockBarang/detail/'.$idContent, 'refresh');
 	}
 
 
