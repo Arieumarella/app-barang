@@ -48,6 +48,8 @@ class BarangPersediaan extends CI_Controller {
 
 	public function exportPersediaan()
 	{
+		ob_start();
+		
 		$bulan = $this->input->post('tgl');
 		$tahun = date('Y');
 		$arrayBulan = array(

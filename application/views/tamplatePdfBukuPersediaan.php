@@ -143,7 +143,7 @@ border-collapse: collapse;
 </head>
 <body>
     <div class="tulisanBiasa">KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</div>
-    <div class="tulisanBiasa">SEKRETARIAT JENDERAL</div>
+    <div class="tulisanBiasa">DIREKTORAT JENDRAL CIPTA KARYA</div>
     <div class="tulisanBiasa">SATKER KONSOLIDASI KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</div>
     <br>
     <h1 class="center">buku persediaan</h1>
@@ -159,12 +159,12 @@ border-collapse: collapse;
             <tr>
                 <td>NAMA UAKPB</td>
                 <td>:</td>
-                <td>PUSAT FASILITASI INFRASTRUKTUR DAERAH</td>
+                <td>BALAI PRASARANA PERMUKIMAN WILAYAH DI YOGYAKARTA</td>
             </tr>
             <tr>
                 <td>KODE UAKPB</td>
                 <td>:</td>
-                <td>033.01.0199.631088</td>
+                <td>505101</td>
             </tr>
         </table>
         <!-- End Tabel kecil 1 -->
@@ -284,18 +284,18 @@ border-collapse: collapse;
                     <td></td>
                     <td><?= number_format(($total_saldo_akhir == null ) ? 0: $total_saldo_akhir,0,',','.'); ?></td>
                 </tr>
-            <?php } ?>
-        </tbody>
-        <tfoot style="font-size:11px;">
-            <tr>
-                <td colspan="3" style="text-align: right;">Jumlah</td>
-                <td colspan="3" style="text-align: center;"><?= $totBarangMasuk; ?></td>
-                <td colspan="3" style="text-align: center;"><?= $totBarangKeluar;  ?></td>
-                <td style="text-align: right;"><?= $unit_persediaan;  ?></td>
-                <td style="text-align: right;">0</td>
-                <td style="text-align: right;"><?= number_format(($total_saldo_akhir == null ) ? 0: $total_saldo_akhir,0,',','.'); ?></td>
-            </tr>
-        </tfoot>
-    </table>
-</body>
-</html>
+                <?php $no++;} ?>
+            </tbody>
+            <tfoot style="font-size:11px;">
+                <tr>
+                    <td colspan="3" style="text-align: right;">Jumlah</td>
+                    <td colspan="3" style="text-align: center;"><?= $totBarangMasuk; ?></td>
+                    <td colspan="3" style="text-align: center;"><?= $totBarangKeluar;  ?></td>
+                    <td style="text-align: right;"><?= $unit_persediaan;  ?></td>
+                    <td style="text-align: right;">0</td>
+                    <td style="text-align: right;"><?= number_format(($total_saldo_akhir == null ) ? 0: $total_saldo_akhir,0,',','.'); ?></td>
+                </tr>
+            </tfoot>
+        </table>
+    </body>
+    </html>

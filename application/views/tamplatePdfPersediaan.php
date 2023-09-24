@@ -152,12 +152,12 @@
             <tr>
                 <td>UAPB</td>
                 <td>:</td>
-                <td>AB21</td>
+                <td>033</td>
             </tr>
             <tr>
                 <td>UAKPB</td>
                 <td>:</td>
-                <td>9834567</td>
+                <td>505101</td>
             </tr>
         </table>
         <!-- End Tabel kecil 1 -->
@@ -171,7 +171,7 @@
                 <td>KEMENTERIAN PEKERJAAN UMUM DAN PERUMAHAN RAKYAT</td>
             </tr>
             <tr>
-                <td>MENAJEMEN KEBINAMARGAAN</td>
+                <td>DIREKTORAT JENDRAL CIPTA KARYA</td>
             </tr>
         </table>
         <!-- End Tabel kecil 2 -->
