@@ -76,23 +76,55 @@
 </div>
 </div>
 
-<!-- Libs JS -->
-<script  src="<?= base_url(); ?>assets/dist/libs/apexcharts/dist/apexcharts.min.js?1668287865" defer></script>
-<script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/js/jsvectormap.min.js?1668287865" defer></script>
-<script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/maps/world.js?1668287865" defer></script>
-<script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/maps/world-merc.js?1668287865" defer></script>
-<!-- Tabler Core -->
-<script  src="<?= base_url(); ?>assets/dist/js/tabler.min.js?1668287865" defer></script>
-<script  src="<?= base_url(); ?>assets/dist/js/demo.min.js?1668287865" defer></script>
-<!-- SweetAlert -->
-<script type="text/javascript" src="<?= base_url(); ?>assets/sweetalert/sweetalert2.js"></script>
-<!-- Toastr -->
-<script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toastr.min.js"></script>
-<!-- Custom Toast -->
-<script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toast_custom.js"></script>
+<!-- Modal PDF -->
+<div class="modal modal-blur fade " id="modalPDFXX" >
+  <div class="modal-dialog modal-xl "style="height:100%;">
+    <div class="modal-content " style="height:100%; margin-top: -40px;">
+      <div style="height: 100%; width: 100%; margin:auto;  justify-content: center;  align-items: center;">
+        <embed src="" id="idEmbed" frameborder="0" width="100%" height="100%">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Modal PDF -->
 
-<!-- Lite Picker -->
-<script src="<?= base_url(); ?>assets/dist/libs/litepicker/dist/litepicker.js" defer></script>
+  <!-- Libs JS -->
+  <script  src="<?= base_url(); ?>assets/dist/libs/apexcharts/dist/apexcharts.min.js?1668287865" defer></script>
+  <script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/js/jsvectormap.min.js?1668287865" defer></script>
+  <script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/maps/world.js?1668287865" defer></script>
+  <script  src="<?= base_url(); ?>assets/dist/libs/jsvectormap/dist/maps/world-merc.js?1668287865" defer></script>
+  <!-- Tabler Core -->
+  <script  src="<?= base_url(); ?>assets/dist/js/tabler.min.js?1668287865" defer></script>
+  <script  src="<?= base_url(); ?>assets/dist/js/demo.min.js?1668287865" defer></script>
+  <!-- SweetAlert -->
+  <script type="text/javascript" src="<?= base_url(); ?>assets/sweetalert/sweetalert2.js"></script>
+  <!-- Toastr -->
+  <script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toastr.min.js"></script>
+  <!-- Custom Toast -->
+  <script type="text/javascript" src="<?= base_url(); ?>assets/toastr/toast_custom.js"></script>
+
+  <!-- Lite Picker -->
+  <script src="<?= base_url(); ?>assets/dist/libs/litepicker/dist/litepicker.js" defer></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+
+      showPdf = async function (url) {
+        let start = await url.indexOf('assets');
+        if (start !== -1) {
+          let result =  await url.substring(start),
+          spasiJadiPersen = await result.replace(/ /g, '%20'); 
+          var parent = await $('embed#idEmbed').parent();
+          var newElement = await "<embed src='"+base_url()+spasiJadiPersen+"' id='idEmbed' frameborder='0' width='100%' height='100%'>";
+
+          await $('embed#idEmbed').remove();
+          await parent.append(newElement);
+          await $('#modalPDFXX').modal('show');
+        } 
+      }
+
+    })
+  </script>
 
 </body>
 </html>

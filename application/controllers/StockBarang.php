@@ -89,6 +89,7 @@ class StockBarang extends CI_Controller {
 		$kon_barang = $this->input->post('kon_barang');
 		$jml_barang = $this->input->post('jml_barang');
 		$hrg_satuan = $this->input->post('hrg_satuan');
+		$tanggalFakturFormat = $arrayDate[2].'-'.$arrayDate[0].'-'.$arrayDate[1];
 
 
 
@@ -162,7 +163,7 @@ class StockBarang extends CI_Controller {
 			}
 		}
 
-		$pros = $this->M_barang->simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan);
+		$pros = $this->M_barang->simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan, $tanggalFakturFormat);
 
 		if ($pros) {
 			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">

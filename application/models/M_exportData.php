@@ -7,7 +7,7 @@ class M_exportData extends CI_Model {
 	{
 		$qry = "SELECT id_satuan, id_kondisi_barang, id_kategori_barang, t_stok_barang.nama_barang, SUM(harga_satuan) AS total_harga FROM t_stok_barang 
 		LEFT JOIN t_barang ON t_stok_barang.id_kategori_barang=t_barang.id
-		WHERE terpakai='0' AND MONTH(t_stok_barang.created_at) <= '$bulan' GROUP By id_kategori_barang";
+		WHERE terpakai='0' AND MONTH(t_stok_barang.tgl_faktur) <= '$bulan' GROUP By id_kategori_barang";
 		
 		return $this->db->query($qry)->result();
 
@@ -31,15 +31,15 @@ class M_exportData extends CI_Model {
 		LEFT JOIN
 		(
 			SELECT x.id_kategori_barang, jns_barang, id_faktur, jml_barang_masuk, total_harga_barang, harga_satuan_barang_masuk,tanggal, jml_stok_sekarang, total_saldo_sekarang, '' AS jml_barang_keluar, '' AS total_harga_barang_keluar, '' AS harga_satuan_barang_keluar  FROM
-			(SELECT 'Barang Masuk' AS jns_barang, id_kategori_barang, id_faktur, COUNT(*) AS jml_barang_masuk, SUM(harga_satuan) AS total_harga_barang,  harga_satuan AS harga_satuan_barang_masuk, DATE(created_at) AS tanggal FROM t_stok_barang 
-				WHERE id_kategori_barang='$id' AND MONTH(created_at) = $bulan GROUP By id_faktur) AS x
+			(SELECT 'Barang Masuk' AS jns_barang, id_kategori_barang, id_faktur, COUNT(*) AS jml_barang_masuk, SUM(harga_satuan) AS total_harga_barang,  harga_satuan AS harga_satuan_barang_masuk, DATE(tgl_faktur) AS tanggal FROM t_stok_barang 
+				WHERE id_kategori_barang='$id' AND MONTH(tgl_faktur) = $bulan GROUP By id_faktur) AS x
 			LEFT JOIN
-			(SELECT id_kategori_barang, COUNT(*) AS jml_stok_sekarang, SUM(harga_satuan) AS total_saldo_sekarang FROM t_stok_barang WHERE id_kategori_barang='$id' AND terpakai='0' AND MONTH(created_at) < $bulan GROUP By id_kategori_barang) AS y
+			(SELECT id_kategori_barang, COUNT(*) AS jml_stok_sekarang, SUM(harga_satuan) AS total_saldo_sekarang FROM t_stok_barang WHERE id_kategori_barang='$id' AND terpakai='0' AND MONTH(tgl_faktur) < $bulan GROUP By id_kategori_barang) AS y
 			ON x.id_kategori_barang=y.id_kategori_barang
 			UNION
 			SELECT x.id_kategori_barang, jns_barang, id_faktur, '' AS jml_barang_masuk, '' AS total_harga_barang, '' AS harga_satuan_barang_masuk,tanggal, jml_stok_sekarang, total_saldo_sekarang, jml_barang_keluar, total_harga_barang_keluar, harga_satuan_barang_keluar  FROM
-			(SELECT 'Barang Keluar' AS jns_barang, id_kategori_barang, id_faktur, COUNT(*) AS jml_barang_keluar, SUM(harga_satuan) AS total_harga_barang_keluar,  harga_satuan AS harga_satuan_barang_keluar, DATE(created_at) AS tanggal FROM t_stok_barang 
-				WHERE id_kategori_barang='$id' AND MONTH(created_at) = $bulan AND terpakai='1' GROUP By tgl_terpakai) AS x
+			(SELECT 'Barang Keluar' AS jns_barang, id_kategori_barang, id_faktur, COUNT(*) AS jml_barang_keluar, SUM(harga_satuan) AS total_harga_barang_keluar,  harga_satuan AS harga_satuan_barang_keluar, DATE(tgl_faktur) AS tanggal FROM t_stok_barang 
+				WHERE id_kategori_barang='$id' AND MONTH(tgl_faktur) = $bulan AND terpakai='1' GROUP By tgl_terpakai) AS x
 			LEFT JOIN
 			(SELECT id_kategori_barang, COUNT(*) AS jml_stok_sekarang, SUM(harga_satuan) AS total_saldo_sekarang FROM t_stok_barang WHERE id_kategori_barang='$id' AND terpakai='0' GROUP By id_kategori_barang) AS y
 			ON x.id_kategori_barang=y.id_kategori_barang
@@ -52,7 +52,7 @@ class M_exportData extends CI_Model {
 
 	public function getDataAwal($id, $bulan)
 	{
-		$qry = "SELECT COUNT(*) AS jml_stok_barang, IF(SUM(harga_satuan)IS NULL,0,SUM(harga_satuan)) AS total_saldo_awal FROM t_stok_barang WHERE terpakai='0' AND id_kategori_barang='$id' AND MONTH(created_at) < '$bulan'";
+		$qry = "SELECT COUNT(*) AS jml_stok_barang, IF(SUM(harga_satuan)IS NULL,0,SUM(harga_satuan)) AS total_saldo_awal FROM t_stok_barang WHERE terpakai='0' AND id_kategori_barang='$id' AND MONTH(tgl_faktur) < '$bulan'";
 
 		return $this->db->query($qry)->row();
 	}

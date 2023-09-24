@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class M_barang extends CI_Model {
 
-	public function simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan)
+	public function simpanBarang($dataInsertFaktur, $jns_barang, $namaKategoriBarang, $kon_barang, $jml_barang, $hrg_satuan, $tanggalFakturFormat)
 	{
 		$this->db->trans_begin();
 
@@ -24,6 +24,7 @@ class M_barang extends CI_Model {
 					'id_faktur' => $last_id,
 					'nama_barang' =>  $namaKategoriBarang[$key],
 					'harga_satuan' => $hrg_satuan[$key],
+					'tgl_faktur' => $tanggalFakturFormat,
 					'created_at' => date('Y-m-d H:i:s')
 				);
 				$this->db->insert('t_stok_barang', $dataInsert);
