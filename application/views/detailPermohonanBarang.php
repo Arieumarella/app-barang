@@ -19,7 +19,7 @@
                   <th>Jenis Barang</th>
                   <th>Jumlah Barang <br> Diminta</th>
                   <th>Status <br> Approval</th>
-                  <th>Jumlah Baraang <br> Approve</th>
+                  <th>Jumlah Baraang <br> Disetujui</th>
                   <th>Catatan <br> Kasubagg TU</th>
                   <th style="width:5%;">Aksi</th>
                 </tr>
@@ -32,11 +32,11 @@
                     <td class="text-end" style="width: 10%;"><?= $val->jml_barang; ?></td>
                     <td class="text-center" style="width: 10%;">
                       <?php if ($val->sts_approval == '0') { ?>
-                        <span class="badge rounded-pill bg-warning" style="color: black;"><b>Panding</b></span>
+                        <span class="badge rounded-pill bg-warning" style="color: black;"><b>Pending</b></span>
                       <?php }elseif ($val->sts_approval == '1') { ?>
-                        <span class="badge rounded-pill bg-success" style="color: black;"><b>Approve</b></span>
+                        <span class="badge rounded-pill bg-success" style="color: black;"><b>Setuju</b></span>
                       <?php }else{ ?>
-                        <span class="badge rounded-pill bg-danger" style="color: black;"><b>Reject</b></span>
+                        <span class="badge rounded-pill bg-danger" style="color: black;"><b>Tolak</b></span>
                       <?php } ?> 
                     </td>
                     <td class="text-end" style="width: 10%;"><?= $val->jml_barang_approve; ?></td>
@@ -67,7 +67,7 @@
                     <th>Jumlah Barang <br> Diminta</th>
                     <th>Jumlah Stock Barang <br> Saat Ini</th>
                     <th>Status <br> Approval</th>
-                    <th>Jumlah Baraang <br> Approve</th>
+                    <th>Jumlah Baraang <br> Disetujui</th>
                     <th>Catatan <br> Kasubagg TU</th>
                   </tr>
                 </thead>
@@ -84,9 +84,9 @@
                         <td class="text-center" style="width: 10%;">
 
                           <select class="form-select form-select text-center" name="sts_aprroval[]" required>
-                            <option value="0" <?= $val->sts_approval == '0' ? 'selected':''; ?>><b>Panding</b></option>
-                            <option value="1" <?= $val->sts_approval == '1' ? 'selected':''; ?>><b>Approve</b></option>
-                            <option value="2" <?= $val->sts_approval == '2' ? 'selected':''; ?>><b>Reject</b></option>
+                            <option value="0" <?= $val->sts_approval == '0' ? 'selected':''; ?>><b>Pending</b></option>
+                            <option value="1" <?= $val->sts_approval == '1' ? 'selected':''; ?>><b>Setuju</b></option>
+                            <option value="2" <?= $val->sts_approval == '2' ? 'selected':''; ?>><b>Tolak</b></option>
                           </select>
 
                         </td>
@@ -282,7 +282,7 @@
           }
 
           if (kondisi == 1) {
-            t_error('Ada barang yang Approve melebihi jumlah Stock Barang!');
+            t_error('Ada barang yang Disetujui melebihi jumlah Stock Barang!');
             return false;
           } else {
             $('#formSubmit').unbind('submit').submit();
