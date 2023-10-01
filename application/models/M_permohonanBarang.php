@@ -149,7 +149,7 @@ class M_permohonanBarang extends CI_Model {
 
 			
 			// Proses Ketika Panding/Reject
-			if ($sts_aprroval[$key] == '0' or $sts_aprroval[$key] == '2') {
+			if ($sts_aprroval[$key] == '2') {
 
 				$dataArryDetail = array(
 					'sts_approval' => $sts_aprroval[$key],
@@ -176,6 +176,7 @@ class M_permohonanBarang extends CI_Model {
 
 						$dataUpdateStockBarang = array(
 							'terpakai' => '1',
+							'id_detail_barang_penggguna' => $idDetail[$key],
 							'tgl_terpakai' => date('Y-m-d H:i:s')
 						);
 
@@ -198,6 +199,39 @@ class M_permohonanBarang extends CI_Model {
 			}
 			// End Proses Ketika Approve
 
+
+			// Proses Ketika Reject
+			if ($sts_aprroval[$key] == '0') {
+
+				$data = $this->db->query("SELECT * FROM t_stok_barang WHERE id_kategori_barang='$id_jns_barang[$key]' AND terpakai='1' and id_detail_barang_penggguna = '$idDetail[$key]'  ORDER BY created_at ASC LIMIT $jml_barang[$key] ")->result();
+
+				foreach ($data as $keyApprove => $valApprove) {
+
+					$dataUpdateStockBarang = array(
+						'terpakai' => '0',
+						'id_detail_barang_penggguna' => '',
+						'tgl_terpakai' => date('Y-m-d H:i:s')
+					);
+
+					$this->db->where(['id' => $valApprove->id]);
+					$this->db->update('t_stok_barang', $dataUpdateStockBarang);
+				}
+
+
+
+				$dataArryDetail = array(
+					'sts_approval' => $sts_aprroval[$key],
+					'jml_barang_approve' => 0,
+					'catatan' => $catatan[$key]
+				);
+
+				$this->db->where(['id' => $idDetail[$key]]);
+				$this->db->update('t_detail_permohonan_barang', $dataArryDetail);
+				
+
+			}
+			// End Proses Ketika Reject
+
 		}
 
 		// Update Data Maseter
@@ -207,6 +241,13 @@ class M_permohonanBarang extends CI_Model {
 			
 			$dataArryDetailX = array(
 				'status_review' => '1'
+			);
+
+			$this->db->where(['id' => $idMaster]);
+			$this->db->update('t_master_permohonan_barang', $dataArryDetailX);
+		}else{
+			$dataArryDetailX = array(
+				'status_review' => '0'
 			);
 
 			$this->db->where(['id' => $idMaster]);
