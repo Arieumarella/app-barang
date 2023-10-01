@@ -30,8 +30,8 @@
                 <td class="text-start" style="width: 10%;"><?= $val->jns_barang; ?></td>
                 <td class="text-start" style="width: 10%;"><?= $val->nama_barang; ?></td>
                 <td class="text-end" style="width: 10%;"><?= $val->jml_barang; ?></td>
-                <td class="text-end" style="width: 10%;"><?= $val->harga_satuan; ?></td>
-                <td class="text-end" style="width: 10%;"><?= $val->harga_satuan*$val->jml_barang; ?></td>
+                <td class="text-end" style="width: 10%;"><?= number_format($val->harga_satuan,0,',','.'); ?></td>
+                <td class="text-end" style="width: 10%;"><?= number_format($val->harga_satuan*$val->jml_barang,0,',','.'); ?></td>
                 <?php if ($this->session->userdata('roll') == '4') { ?>
                  <td class="text-center" style="width: 5%;">
                   <button class="btn btn-warning btn-icon" onclick="editData('<?= $val->id_faktur; ?>', '<?= $val->id_kategori_barang; ?>', '<?= $idContent; ?>');"><i class="fa-solid fa-file-pen"></i></button>

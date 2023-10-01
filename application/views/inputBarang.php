@@ -341,11 +341,15 @@
         "class" : "text-center"
       },
       {
-        "data": "total_hargaX", 
+        "data": null, 
         "name": "Jumlah Transaksi",
         "width" : "20%",
         "class" : "text-end",
         "orderable": false,
+        "render": function(data, type, full, meta) {
+
+          return formatAngka(data.total_hargaX);
+        }
       },
       {
         "data": null, 
@@ -393,6 +397,10 @@
       dataTable.search(searchValue).draw();
     });
 
+
+    function formatAngka(angka) {
+      return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
 
     let dataTanggal = new Litepicker({
