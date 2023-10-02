@@ -59,7 +59,7 @@ class M_barang extends CI_Model {
 	public function get_filtered_data($start, $length, $search, $orderColumn, $orderDirection) {
 		$this->db->select('t_faktur.*, a.total_hargaX');
 		$this->db->from('t_faktur');
-		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang WHERE terpakai='0' GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
+		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
 
 		if (!empty($search)) {
 			$this->db->like('t_faktur.no_faktur', $search);
@@ -83,7 +83,7 @@ class M_barang extends CI_Model {
 
 	public function get_filtered_total($search) {
 		$this->db->from('t_faktur');
-		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang WHERE terpakai='0' GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
+		$this->db->join("(SELECT id_faktur, SUM(harga_satuan) AS total_hargaX FROM t_stok_barang GROUP BY id_faktur) as a", 't_faktur.id = a.id_faktur', 'left');
 
 		if (!empty($search)) {
 			$this->db->like('t_faktur.no_faktur', $search);
