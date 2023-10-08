@@ -44,9 +44,21 @@
       <div class="modal-body">
         <form action="<?= base_url(); ?>PermohonanBarang/simpanPermintaan" method="POST" enctype="multipart/form-data">
           <div class="row">
-            <div class="mb-3 col-12">
-              <div class="form-label">Surat Permohonan Barang</div>
-              <input type="file" class="form-control" name="permohonanBarang" accept=".pdf" required>
+            <div class="mb-3 col-6">
+              <div class="form-label">Nama Pemohon</div>
+              <input type="text" class="form-control" name="nmPemohon" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">NIP</div>
+              <input type="text" class="form-control" name="nip" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Jabatan</div>
+              <input type="text" class="form-control" name="jbt" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Subbagian/PPK</div>
+              <input type="text" class="form-control" name="ppk" required>
             </div>
             <hr class="mt-3" >
             <div id="contentFormPermohonan">
@@ -90,15 +102,51 @@
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Form Upload Dokumen BAST</h5>
+        <h5 class="modal-title">Form Input Data BAST</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form action="<?= base_url(); ?>PermohonanBarang/uploadBast" method="POST"  enctype="multipart/form-data">
           <input type="hidden" name="idBarangBAST" id="idBarangBAST">
-          <div class="mb-3 col-12">
-            <div class="form-label">Dokumen BAST</div>
-            <input type="file" class="form-control" name="bast" accept=".pdf" required>
+          <div class="row">
+            <div class="mb-3 col-12">
+              <div class="form-label">Nomor Suart</div>
+              <input type="text" class="form-control" name="noSurat" id="noSurat" required>
+            </div>
+            <hr>
+            <div class="mb-3 col-6">
+              <div class="form-label">Nama Pihak Pertama</div>
+              <input type="text" class="form-control" name="pihak1" id="pihak1" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Jabatan Pihak Pertama</div>
+              <input type="text" class="form-control" name="jabatan1" id="jabatan1" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">NIP Pihak Pertama</div>
+              <input type="text" class="form-control" name="nip1" id="nip1" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Alamat Pihak Pertama</div>
+              <input type="text" class="form-control" name="alamat1" id="alamat1" required>
+            </div>
+            <hr>
+            <div class="mb-3 col-6">
+              <div class="form-label">Nama Pihak Kedua</div>
+              <input type="text" class="form-control" name="pihak2" id="pihak2" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Jabatan Pihak Kedua</div>
+              <input type="text" class="form-control" name="jabatan2" id="jabatan2" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">NIP Pihak Pertama</div>
+              <input type="text" class="form-control" name="nip2" id="nip2" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Alamat Pihak Kedua</div>
+              <input type="text" class="form-control" name="alamat2" id="alamat2" required>
+            </div>
           </div>
           <div class="modal-footer">
             <a href="#" class="btn btn-link link-secondary ms-auto" data-bs-dismiss="modal">
@@ -126,9 +174,21 @@
         <form action="<?= base_url(); ?>PermohonanBarang/simpanEditPermintaan" method="POST" enctype="multipart/form-data">
           <input type="hidden" name="idEditData" id="idEditData">
           <div class="row">
-            <div class="mb-3 col-12">
-              <div class="form-label">Surat Permohonan Barang</div>
-              <input type="file" class="form-control" name="permohonanBarang" accept=".pdf" required>
+            <div class="mb-3 col-6">
+              <div class="form-label">Nama Pemohon</div>
+              <input type="text" class="form-control" name="nmPemohon" id="nmPemohonEdit" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">NIP</div>
+              <input type="text" class="form-control" name="nip" id="nipEdit" oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/(\..*?)\..*/g, '$1');" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Jabatan</div>
+              <input type="text" class="form-control" name="jbt" id="jbtEdit" required>
+            </div>
+            <div class="mb-3 col-6">
+              <div class="form-label">Subbagian/PPK</div>
+              <input type="text" class="form-control" name="ppk" id="ppkEdit" required>
             </div>
             <p style="color: red;">*Untuk edit barang silakan masuk pada detail barang.</p>
             <div class="modal-footer">
@@ -158,7 +218,22 @@
 
       $('#idEditData').val(id);
 
-      $('#modalEditData').modal('show');
+      ajaxUntukSemua(base_url()+'PermohonanBarang/getdatEditById', {id}, function(data) {
+
+        $('#nmPemohonEdit').val(data.nmPemohon);
+        $('#nipEdit').val(data.nip);
+        $('#jbtEdit').val(data.jbt);
+        $('#ppkEdit').val(data.ppk);
+        $('#modalEditData').modal('show');
+
+      }, 
+      function(error) {
+        console.log('Kesalahan:', error);
+        t_error('Sistem Error, Pesan : '+error)
+      });
+
+
+
 
     }
 
@@ -230,7 +305,29 @@
 
     showModalUploadBast = function (id) {
       $('#idBarangBAST').val(id);
-      $('#modalAksiBast').modal('show');
+
+      ajaxUntukSemua(base_url()+'PermohonanBarang/getdatEditById', {id}, function(data) {
+
+        $('#noSurat').val(data.noSurat);
+        $('#pihak1').val(data.pihak1);
+        $('#jabatan1').val(data.jabatan1);
+        $('#nip1').val(data.nip1);
+        $('#alamat1').val(data.alamat1);
+        $('#pihak2').val(data.pihak2);
+        $('#jabatan2').val(data.jabatan2);
+        $('#nip2').val(data.nip2);
+        $('#alamat2').val(data.alamat2);
+
+        $('#modalAksiBast').modal('show');
+
+      }, 
+      function(error) {
+        console.log('Kesalahan:', error);
+        t_error('Sistem Error, Pesan : '+error)
+      });
+
+
+      
     }
 
 
@@ -365,7 +462,7 @@
         "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
-          return jumlah_barang = (data.path_permohonanBarang != null) ? `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_permohonanBarang+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`:``;
+          return  `<a href="${base_url()}PermohonanBarang/exportPermohonanBarang/${data.id}" target="_blank" class="btn btn-danger btn-icon"><i class="fa-solid fa-file-pdf fa-lg"></i></a>`;
         },
         "orderable": false,
       },
@@ -375,7 +472,7 @@
         "width" : "10%",
         "class" : "text-center",
         "render": function(data, type, full, meta) {
-          return bast = (data.path_bast != null) ? `<button class="btn btn-danger btn-icon" onclick="showPdf('`+data.path_bast+`')"><i class="fa-solid fa-file-pdf fa-lg"></i></button>`:``;
+          return (data.pihak1 != null) ?`<a href="${base_url()}PermohonanBarang/exportBast/${data.id}" target="_blank" class="btn btn-danger btn-icon"><i class="fa-solid fa-file-pdf fa-lg"></i></a>`:'';
         },
         "orderable": false,
       },

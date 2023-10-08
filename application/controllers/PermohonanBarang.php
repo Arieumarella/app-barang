@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use Dompdf\Dompdf;
+
 class PermohonanBarang extends CI_Controller {
 
 	public function __construct() {
@@ -51,70 +53,38 @@ class PermohonanBarang extends CI_Controller {
 		$jns_barang = $this->input->post('jns_barang');
 		$jml_barang = $this->input->post('jml_barang');
 		$username = $this->session->userdata('username');
+		$nmPemohon = $this->input->post('nmPemohon');
+		$nip = $this->input->post('nip');
+		$jbt = $this->input->post('jbt');
+		$ppk = $this->input->post('ppk');
 		$nmFileGagalUpload = '';
 
 		$inputDataMaster = array(
 			'username_pemohon' => $username,
 			'tgl_pengajuan' => date('Y-m-d H:i:s'),
+			'nmPemohon' => $nmPemohon,
+			'jbt' => $jbt,
+			'ppk' => $ppk,
+			'nip' => $nip,
 			'created_at' => date('Y-m-d H:i:s')
 		);
 
-		if (!file_exists('./assets/upload Dokumen Permintaan Barang')) {
-			mkdir('./assets/upload Dokumen Permintaan Barang');
-		}
 
+		$pros = $this->M_permohonanBarang->simpanData($inputDataMaster, $jns_barang, $jml_barang);
 
-		if (!file_exists("./assets/upload Dokumen Permintaan Barang/$username")) {
-			mkdir("./assets/upload Dokumen Permintaan Barang/$username");
-		}
-
-
-		$path = "./assets/upload Dokumen Permintaan Barang/$username/";
-
-		$pathX = $_FILES['permohonanBarang']['name'];
-		$ext = pathinfo($pathX, PATHINFO_EXTENSION);
-
-
-		$config['upload_path'] = $path;
-		$config['allowed_types'] = 'pdf';
-		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
-		$config['max_size'] = 100000;
-
-		$this->load->library('upload', $config);
-
-		if (!$this->upload->do_upload('permohonanBarang')){
-
-			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal Disimpan dengan alasan '.$this->upload->display_errors().'
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>');
-
-			redirect('/PermohonanBarang', 'refresh');
-
 		}else{
-
-			$upload_data = $this->upload->data();
-			$namaFile = $upload_data['file_name'];
-			$fullPath = $upload_data['full_path'];
-			$inputDataMaster["path_permohonanBarang"] = $fullPath;
-
-			$pros = $this->M_permohonanBarang->simpanData($inputDataMaster, $jns_barang, $jml_barang);
-
-			if ($pros) {
-				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data berhasil Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}else{
-				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data Gagal Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}
-
-			redirect('/PermohonanBarang', 'refresh');
-
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
 		}
+
+		redirect('/PermohonanBarang', 'refresh');
 
 	}
 
@@ -315,58 +285,45 @@ class PermohonanBarang extends CI_Controller {
 	{
 		$id = $this->input->post('idBarangBAST');
 
+		$noSurat = $this->input->post('noSurat');
+		$pihak1 = $this->input->post('pihak1');
+		$jabatan1 = $this->input->post('jabatan1');
+		$nip1 = $this->input->post('nip1');
+		$alamat1 = $this->input->post('alamat1');
+		$pihak2 = $this->input->post('pihak2');
+		$jabatan2 = $this->input->post('jabatan2');
+		$nip2 = $this->input->post('nip2');
+		$alamat2 = $this->input->post('alamat2');
 
-		if (!file_exists('./assets/upload Dokumen BAST')) {
-			mkdir('./assets/upload Dokumen BAST');
-		}
+
+		$dataEdit = array(
+			'noSurat' => $noSurat,
+			'pihak1' => $pihak1,
+			'jabatan1' => $jabatan1,
+			'nip1' => $nip1,
+			'alamat1' => $alamat1,
+			'pihak2' => $pihak2,
+			'jabatan2' => $jabatan2,
+			'nip2' => $nip2,
+			'alamat2' =>$alamat2
+		);
 
 
-		$path = "./assets/upload Dokumen BAST/";
+		$pros = $this->M_dinamis->update('t_master_permohonan_barang', $dataEdit, ['id' => $id]);
 
-		$pathX = $_FILES['bast']['name'];
-		$ext = pathinfo($pathX, PATHINFO_EXTENSION);
-
-
-		$config['upload_path'] = $path;
-		$config['allowed_types'] = 'pdf';
-		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
-		$config['max_size'] = 100000;
-
-		$this->load->library('upload', $config);
-
-		if (!$this->upload->do_upload('bast')){
-
-			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal Disimpan dengan alasan '.$this->upload->display_errors().'
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>');
-
-			redirect('/PermohonanBarang', 'refresh');
-
 		}else{
-
-			$upload_data = $this->upload->data();
-			$namaFile = $upload_data['file_name'];
-			$fullPath = $upload_data['full_path'];
-			$inputDataMaster["path_permohonanBarang"] = $fullPath;
-
-			$pros = $this->M_dinamis->update('t_master_permohonan_barang', ['path_bast' => $fullPath], ['id' => $id]);
-
-			if ($pros) {
-				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data berhasil Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}else{
-				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data Gagal Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}
-
-			redirect('/PermohonanBarang', 'refresh');
-
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
 		}
+
+		redirect('/PermohonanBarang', 'refresh');
 
 	}
 
@@ -375,65 +332,39 @@ class PermohonanBarang extends CI_Controller {
 	{
 		$id = $this->input->post('idEditData');
 
+		$nmPemohon = $this->input->post('nmPemohon');
+		$nip = $this->input->post('nip');
+		$jbt = $this->input->post('jbt');
+		$ppk = $this->input->post('ppk');
+
+		$dataEdit = array(
+			'nmPemohon' => $nmPemohon,
+			'jbt' => $jbt,
+			'ppk' => $ppk,
+			'nip' => $nip,
+			'updated_at' => date('Y-m-d H:i:s')
+		);
+
+
 		$username = $this->session->userdata('username');
 		$nmFileGagalUpload = '';
 
 
-		if (!file_exists('./assets/upload Dokumen Permintaan Barang')) {
-			mkdir('./assets/upload Dokumen Permintaan Barang');
-		}
+		$pros = $this->M_dinamis->update('t_master_permohonan_barang', $dataEdit, ['id' => $id]);
 
-
-		if (!file_exists("./assets/upload Dokumen Permintaan Barang/$username")) {
-			mkdir("./assets/upload Dokumen Permintaan Barang/$username");
-		}
-
-
-		$path = "./assets/upload Dokumen Permintaan Barang/$username/";
-
-		$pathX = $_FILES['permohonanBarang']['name'];
-		$ext = pathinfo($pathX, PATHINFO_EXTENSION);
-
-
-		$config['upload_path'] = $path;
-		$config['allowed_types'] = 'pdf';
-		$config['file_name'] = 'upload_time_'.date('Y-m-d').'_'.time().'.'.$ext;
-		$config['max_size'] = 100000;
-
-		$this->load->library('upload', $config);
-
-		if (!$this->upload->do_upload('permohonanBarang')){
-
-			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-				<strong>Berhasil.!</strong> Data Gagal Disimpan dengan alasan '.$this->upload->display_errors().'
+		if ($pros) {
+			$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data berhasil Disimpan.!
 				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 				</div>');
-
-			redirect('/PermohonanBarang', 'refresh');
-
 		}else{
-
-			$upload_data = $this->upload->data();
-			$namaFile = $upload_data['file_name'];
-			$fullPath = $upload_data['full_path'];
-
-			$pros = $this->M_dinamis->update('t_master_permohonan_barang', ['path_permohonanBarang' => $fullPath], ['id' => $id]);
-
-			if ($pros) {
-				$this->session->set_flashdata('psn', '<div class="alert alert-success alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data berhasil Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}else{
-				$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-					<strong>Berhasil.!</strong> Data Gagal Disimpan.!
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-					</div>');
-			}
-
-			redirect('/PermohonanBarang', 'refresh');
-
+			$this->session->set_flashdata('psn', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<strong>Berhasil.!</strong> Data Gagal Disimpan.!
+				<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				</div>');
 		}
+
+		redirect('/PermohonanBarang', 'refresh');
 	}
 
 
@@ -475,6 +406,66 @@ class PermohonanBarang extends CI_Controller {
 
 		redirect('/PermohonanBarang/detailPermohonan/'.$idDetail, 'refresh');
 
+	}
+
+
+	public function exportPermohonanBarang($id=null)
+	{
+		ob_start();
+
+		$tmp = array(
+			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]),
+			'dataBody' => $this->M_permohonanBarang->getDataTabelX($id)
+		);
+
+
+		$combined_html = $this->load->view('expordSuratPermohonan', $tmp, TRUE);
+
+		$dompdf = new Dompdf();
+		$dompdf->set_option('isHtml5ParserEnabled', true);
+		$dompdf->set_option('isRemoteEnabled', true);
+		$dompdf->setPaper('A4', 'portrait'); 
+		
+		$dompdf->loadHtml($combined_html);
+		$dompdf->render();
+		$pdf_content = $dompdf->output();
+		ob_end_clean();
+		$dompdf->stream('gabungan_pdf.pdf', array('Attachment' => 0));
+	}
+
+
+	public function exportBast($id='')
+	{
+		ob_start();
+
+		$tmp = array(
+			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]),
+			'dataBody' => $this->M_permohonanBarang->dataBastBody($id)
+		);
+
+		$html = $this->load->view('expordBast', $tmp, TRUE);
+		$html2 = $this->load->view('expordBast2', $tmp, TRUE);
+		$combined_html = $html.$html2;
+
+		$dompdf = new Dompdf();
+		$dompdf->set_option('isHtml5ParserEnabled', true);
+		$dompdf->set_option('isRemoteEnabled', true);
+		$dompdf->setPaper('A4', 'portrait'); 
+		
+		$dompdf->loadHtml($combined_html);
+		$dompdf->render();
+		$pdf_content = $dompdf->output();
+		ob_end_clean();
+		$dompdf->stream('gabungan_pdf.pdf', array('Attachment' => 0));
+	}
+
+
+	public function getdatEditById()
+	{
+		$id = $this->input->post('id');
+
+		$data = $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]);
+		echo json_encode($data);
 	}
 
 

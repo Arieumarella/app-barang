@@ -177,6 +177,7 @@ class M_permohonanBarang extends CI_Model {
 						$dataUpdateStockBarang = array(
 							'terpakai' => '1',
 							'id_detail_barang_penggguna' => $idDetail[$key],
+							'id_pengguna' => $idMaster,
 							'tgl_terpakai' => date('Y-m-d H:i:s')
 						);
 
@@ -210,6 +211,7 @@ class M_permohonanBarang extends CI_Model {
 					$dataUpdateStockBarang = array(
 						'terpakai' => '0',
 						'id_detail_barang_penggguna' => '',
+						'id_pengguna' => '0',
 						'tgl_terpakai' => date('Y-m-d H:i:s')
 					);
 
@@ -266,6 +268,36 @@ class M_permohonanBarang extends CI_Model {
 
 	}
 
+
+	public function dataBastBody($id=null)
+	{
+		$qry = "SELECT b.nama_barang, d.nama_satuan, a.total_harga, c.kondisi_barang, a.jml_barang FROM 
+		(SELECT COUNT(*) AS jml_barang, SUM(harga_satuan) AS total_harga, t_stok_barang.* FROM t_stok_barang WHERE terpakai='1' AND id_pengguna='$id' GROUP BY id_kategori_barang) AS a
+		LEFT JOIN
+		(SELECT * FROM t_barang) AS b ON a.id_kategori_barang=b.id
+		LEFT JOIN
+		(SELECT * FROM t_kondisi_barang) AS c ON a.id_kondisi_barang=c.id
+		LEFT JOIN
+		(SELECT * FROM t_satuan) AS d ON b.id_satuan=d.id";
+
+		return $this->db->query($qry)->result();
+	}
+
+
+	public function getDataTabelX($id)
+	{
+		$qry = "SELECT nama_barang, nama_satuan, COUNT(*) AS jml_barang FROM 
+		(SELECT * FROM t_detail_permohonan_barang WHERE id_master='$id') AS a
+		LEFT JOIN
+		(SELECT id AS id_barang, id_satuan, nama_barang FROM t_barang) AS b ON a.id_jns_barang=b.id_barang
+		LEFT JOIN
+		(SELECT * FROM t_satuan) AS c ON c.id=b.id_satuan
+		GROUP BY nama_barang ORDER BY nama_barang";
+
+		return $this->db->query($qry)->result();
+
+
+	}
 
 	public function getStockBarangById($id)
 	{
