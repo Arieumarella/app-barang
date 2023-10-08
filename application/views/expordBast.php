@@ -144,7 +144,7 @@
     </div>
   </header>
   <main>
-    <p>Pada hari ini Jumat tanggal 29 bulan September tahun 2023 bertempat di Yogyakarta yang
+    <p>Pada hari ini <?= $nmHari; ?> tanggal <?= $tanggal; ?> bulan <?= $namaBulan; ?> tahun <?= $tahun; ?> bertempat di Yogyakarta yang
       bertanda tangan di bawah ini
     </p>
     <!-- Tabel Baru -->

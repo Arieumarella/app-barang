@@ -147,22 +147,6 @@ class M_permohonanBarang extends CI_Model {
 
 		foreach ($sts_aprroval as $key => $value) {
 
-			
-			// Proses Ketika Panding/Reject
-			if ($sts_aprroval[$key] == '2') {
-
-				$dataArryDetail = array(
-					'sts_approval' => $sts_aprroval[$key],
-					'catatan' => $catatan[$key]
-				);
-
-				$this->db->where(['id' => $idDetail[$key]]);
-				$this->db->update('t_detail_permohonan_barang', $dataArryDetail);
-
-
-			}
-			// End Proses Ketika Panding/Reject
-
 
 			// Proses Ketika Approve
 			if ($sts_aprroval[$key] == '1') {
@@ -202,10 +186,10 @@ class M_permohonanBarang extends CI_Model {
 
 
 			// Proses Ketika Reject
-			if ($sts_aprroval[$key] == '0') {
+			if ($sts_aprroval[$key] == '2' or $sts_aprroval[$key] == '0') {
 
-				$data = $this->db->query("SELECT * FROM t_stok_barang WHERE id_kategori_barang='$id_jns_barang[$key]' AND terpakai='1' and id_detail_barang_penggguna = '$idDetail[$key]'  ORDER BY created_at ASC LIMIT $jml_barang[$key] ")->result();
-
+				$data = $this->db->query("SELECT * FROM t_stok_barang WHERE id_kategori_barang='$id_jns_barang[$key]' AND terpakai='1' and id_detail_barang_penggguna = '$idDetail[$key]' and id_pengguna='$idMaster'  ORDER BY created_at ASC LIMIT $jml_barang[$key] ")->result();
+				
 				foreach ($data as $keyApprove => $valApprove) {
 
 					$dataUpdateStockBarang = array(
@@ -223,7 +207,7 @@ class M_permohonanBarang extends CI_Model {
 
 				$dataArryDetail = array(
 					'sts_approval' => $sts_aprroval[$key],
-					'jml_barang_approve' => 0,
+					'jml_barang_approve' => '0',
 					'catatan' => $catatan[$key]
 				);
 

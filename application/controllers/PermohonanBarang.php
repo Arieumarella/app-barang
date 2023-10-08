@@ -438,10 +438,21 @@ class PermohonanBarang extends CI_Controller {
 	{
 		ob_start();
 
+		$dataMaster = $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]);
+		$dataBody = $this->M_permohonanBarang->dataBastBody($id);
+		$timestamp =  explode('-',substr($dataMaster->updated_at, 0, 10));
+
+
 		$tmp = array(
-			'dataMaster' => $this->M_dinamis->getById('t_master_permohonan_barang', ['id' => $id]),
-			'dataBody' => $this->M_permohonanBarang->dataBastBody($id)
+			'dataMaster' => $dataMaster,
+			'dataBody' => $dataBody,
+			'tanggal' => $timestamp[2],
+			'tahun' =>  $timestamp[0],
+			'namaBulan' => $this->getBulan($timestamp[1]),
+			'nmHari' => $this->getHari(date('l', strtotime("$timestamp[0]-$timestamp[1]-$timestamp[2]")))
 		);
+
+
 
 		$html = $this->load->view('expordBast', $tmp, TRUE);
 		$html2 = $this->load->view('expordBast2', $tmp, TRUE);
@@ -451,7 +462,7 @@ class PermohonanBarang extends CI_Controller {
 		$dompdf->set_option('isHtml5ParserEnabled', true);
 		$dompdf->set_option('isRemoteEnabled', true);
 		$dompdf->setPaper('A4', 'portrait'); 
-		
+
 		$dompdf->loadHtml($combined_html);
 		$dompdf->render();
 		$pdf_content = $dompdf->output();
@@ -468,5 +479,72 @@ class PermohonanBarang extends CI_Controller {
 		echo json_encode($data);
 	}
 
+
+	private function getBulan($bln)
+	{
+		switch ($bln) {
+			case '01':
+			return "Januari";
+			break;
+			case '02':
+			return "Februari";
+			break;
+			case '03':
+			return "Maret";
+			break;
+			case '04':
+			return "April";
+			break;
+			case '05':
+			return "Mei";
+			break;
+			case '06':
+			return "Juni";
+			break;
+			case '07':
+			return "Juli";
+			break;
+			case '08':
+			return "Agustus";
+			break;
+			case '09':
+			return "September";
+			break;
+			case '10':
+			return "Oktober";
+			break;
+			case '11':
+			return "November";
+			break;
+			case '12':
+			return "Desember";
+			break;
+			default:
+			return "Nama Bulan Tidak Ditemukan";
+		}
+	}
+
+
+	private function getHari($namaHari)
+	{
+		if ($namaHari == 'Monday') {
+			$namaHari = 'Senin';
+		} elseif ($namaHari == 'Tuesday') {
+			$namaHari = 'Selasa';
+		} elseif ($namaHari == 'Wednesday') {
+			$namaHari = 'Rabu';
+		} elseif ($namaHari == 'Thursday') {
+			$namaHari = 'Kamis';
+		} elseif ($namaHari == 'Friday') {
+			$namaHari = 'Jumat';
+		} elseif ($namaHari == 'Saturday') {
+			$namaHari = 'Sabtu';
+		} elseif ($namaHari == 'Sunday') {
+			$namaHari = 'Minggu';
+		}
+
+		return $namaHari;
+
+	}
 
 }
